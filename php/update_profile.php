@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1 class="text-3xl md:text-4xl font-semibold">Update Profil</h1>
     </div>
 
-    <form method="POST" class="space-y-6">
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
       <!-- Nama -->
       <div>
         <label class="block mb-1 font-medium">Nama Lengkap</label>
