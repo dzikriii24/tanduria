@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/icon.css">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <title>Tanduria</title>
 </head>
 
@@ -127,18 +128,17 @@
 
     <!-- Chart Container -->
     <div class="mt-10 mb-40">
-        <div class="max-w-4xl mx-auto p-4 bg-white rounded-xl shadow">
-            <canvas id="lahanChart" height="200"></canvas>
-        </div>
+        <div id="lahanChartApex"></div>
 
-        <!-- Modal -->
-        <div id="faseModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center">
-            <div class="bg-white p-6 rounded-lg w-80 shadow-lg">
-                <h2 class="text-xl font-bold mb-2" id="modalTitle">Info Lahan</h2>
-                <p id="faseText" class="text-gray-700">Loading...</p>
-                <button onclick="closeModal()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Tutup</button>
+        <!-- Modal (seperti sebelumnya) -->
+        <div id="faseModal" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-40 justify-center items-center">
+            <div class="bg-white p-6 rounded-lg max-w-sm">
+                <h2 id="modalTitle" class="text-xl font-bold mb-2"></h2>
+                <p id="faseText"></p>
+                <button onclick="closeModal()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Tutup</button>
             </div>
         </div>
+
     </div>
 
     <!-- Menu -->
@@ -171,7 +171,7 @@
                 <span>Edukasi</span>
             </a>
             <!-- Settings -->
-            <a href="settings.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+            <a href="php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>
@@ -179,31 +179,35 @@
     </div>
 
     <!-- Jotform AI Chatbot -->
-    <script
-        src='https://cdn.jotfor.ms/agent/embedjs/0197d993e310730e9d3145fd98455ecb6d21/embed.js?skipWelcome=1&maximizable=1'>
-    </script>
-    <script>
-        window.addEventListener("DOMContentLoaded", function() {
-            window.AgentInitializer.init({
-                rootId: "JotformAgent-0197d993e310730e9d3145fd98455ecb6d21",
-                formID: "0197d993e310730e9d3145fd98455ecb6d21",
-                queryParams: ["skipWelcome=1", "maximizable=1"],
-                domain: "https://www.jotform.com",
-                isInitialOpen: false,
-                isDraggable: false,
-                background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-                buttonBackgroundColor: "#0066C3",
-                buttonIconColor: "#FFFFFF",
-                variant: false,
-                customizations: {
-                    greeting: "Yes",
-                    greetingMessage: "Halo! Ada yang bisa saya bantu?",
-                    pulse: "Yes",
-                    position: "right"
-                }
+    <div class="fixed bottom-10 right-2 ">
+        <script
+            src='https://cdn.jotfor.ms/agent/embedjs/0197d993e310730e9d3145fd98455ecb6d21/embed.js?skipWelcome=1&maximizable=1'>
+        </script>
+        <script>
+            window.addEventListener("DOMContentLoaded", function() {
+                window.AgentInitializer.init({
+                    rootId: "JotformAgent-0197d993e310730e9d3145fd98455ecb6d21",
+                    formID: "0197d993e310730e9d3145fd98455ecb6d21",
+                    queryParams: ["skipWelcome=1", "maximizable=1"],
+                    domain: "https://www.jotform.com",
+                    isInitialOpen: false,
+                    isDraggable: false,
+                    background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
+                    buttonBackgroundColor: "#0066C3",
+                    buttonIconColor: "#FFFFFF",
+                    variant: false,
+                    customizations: {
+                        greeting: "Yes",
+                        greetingMessage: "Halo! Ada yang bisa saya bantu?",
+                        pulse: "Yes",
+                        position: "right"
+                    }
+                });
             });
-        });
-    </script>
+        </script>
+
+    </div>
+
 
 
 

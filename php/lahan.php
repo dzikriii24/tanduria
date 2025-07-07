@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Lahan</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/icon.css">
 </head>
 <body class="bg-white min-h-screen flex flex-col">
 
@@ -26,7 +27,7 @@
         <p>Jenis padi : Premium</p>
         <p>Mulai Tanam : 15/05/1945</p>
         <div class="mt-3 text-right">
-          <a href="#" class="text-sm text-black hover:underline flex items-center justify-end gap-1">
+          <a href="detailLahan.php" class="text-sm text-black hover:underline flex items-center justify-end gap-1">
             Lihat detail lahan →
           </a>
         </div>
@@ -67,13 +68,13 @@
             </a>
 
             <!-- Bookmark -->
-            <a href="" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+            <a href="../php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
                 <i class="fi fi-ss-bell text-lg"></i>
                 <span>Notifikasi</span>
             </a>
 
             <!-- Post -->
-            <a href="php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+            <a href="../php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg">
                     <i class="fi fi-sr-land-layers text-xl"></i>
                 </div>
@@ -81,12 +82,12 @@
             </a>
 
             <!-- Search -->
-            <a href="search.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+            <a href="../php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
                 <i class="fi fi-ss-book-open-cover text-lg"></i>
                 <span>Edukasi</span>
             </a>
             <!-- Settings -->
-            <a href="settings.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+            <a href="../php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>
