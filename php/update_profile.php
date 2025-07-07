@@ -84,6 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           Simpan Perubahan
         </button>
       </div>
+      <!-- Tombol Kembali -->
+<div class="pt-3">
+  <a href="profile.php"
+     class="block text-center w-full bg-gray-200 text-gray-700 font-medium py-3 rounded-lg text-base md:text-lg hover:bg-gray-300 transition">
+    Kembali
+  </a>
+</div>
+
     </form>
   </div>
 
