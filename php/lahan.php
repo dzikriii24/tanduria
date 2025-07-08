@@ -135,6 +135,7 @@ $conn->close();
     </div>
   </div>
 
+<<<<<<< HEAD
   <footer class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-gray-200">
     <div class="grid grid-cols-5 text-center text-xs text-gray-500">
       <a href="index.php" class="group py-2 px-3 flex flex-col items-center hover:text-blue-600">
@@ -148,6 +149,41 @@ $conn->close();
       <a href="../php/lahan.php" class="group py-2 px-3 flex flex-col items-center hover:text-blue-600">
         <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg">
           <i class="fi fi-sr-land-layers text-xl"></i>
+=======
+  <!-- Footer Navigasi -->
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-gray-200">
+        <div class="grid grid-cols-5 text-center text-xs text-gray-500">
+            <!-- Home -->
+            <a href="../index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all active-nav">
+                <i class="fi fi-sr-home text-lg"></i>
+                <span class="">Dashboard</span>
+            </a>
+
+            <!-- Bookmark -->
+            <a href="../php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+                <i class="fi fi-ss-bell text-lg"></i>
+                <span>Notifikasi</span>
+            </a>
+
+            <!-- Post -->
+            <a href="../php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg">
+                    <i class="fi fi-sr-land-layers text-xl"></i>
+                </div>
+                <span class="mt-1 text-blue-600">Lahan</span>
+            </a>
+
+            <!-- Search -->
+            <a href="../php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+                <i class="fi fi-ss-book-open-cover text-lg"></i>
+                <span>Edukasi</span>
+            </a>
+            <!-- Settings -->
+            <a href="../php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+                <i class="fi fi-sr-user text-lg"></i>
+                <span>Profil</span>
+            </a>
+>>>>>>> 6e692d4 (indexs)
         </div>
         <span class="mt-1 text-blue-600">Lahan</span>
       </a>

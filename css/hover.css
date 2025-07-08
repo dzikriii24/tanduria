@@ -1,0 +1,29 @@
+  :root {
+      --hijautua: #1D6034;
+      --hijaumuda: #2C8F53;
+      --krem: #F5F2EB;
+      --merah: #B03C3C;
+      --hijaulemon: #A3CC5A;
+      --abugelap: #4E4E4E;
+  }
+
+  .hovers {
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 1px 3px rgb(34, 114, 2),
+          0 1px 2px rgb(255, 251, 251);
+  }
+
+  .hovers:hover {
+      box-shadow: 0 10px 20px rgb(255, 255, 255),
+          0 6px 6px rgb(255, 255, 255);
+
+  }
+
+  .hover-gelap {
+      transition: all 0.3s ease-in-out;
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  }
+
+  .hover-gelap:hover {
+      box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  }

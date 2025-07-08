@@ -218,6 +218,7 @@ $aktivitas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <button type="submit" class="mt-4 px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Simpan Aktivitas</button>
   </form>
 
+<<<<<<< HEAD
  <!-- Daftar Aktivitas -->
  <div class="mt-4 mx-auto px-4">
     <h3 class="text-black text-xl font-semibold mx-auto px-4 flex justify-start items-start">Riwayat Aktivitas Lahan</h3>
@@ -249,5 +250,165 @@ $aktivitas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
   <br>
 <p>alamak oyy kajung ruan</p>
 </div>
+=======
+                        <p class="mt-1 text-sm text-gray-700">Oleh Mang Ujang</p>
+                    </div>
+                </div>
+
+                <dl class="mt-6 flex gap-4 lg:gap-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-700">Tanggal</dt>
+
+                        <dd class="text-xs text-gray-700">31/06/2025</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-sm font-medium text-gray-700">Jumlah</dt>
+
+                        <dd class="text-xs text-gray-700">10 Karung</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-700">Biaya</dt>
+
+                        <dd class="text-xs text-gray-700">Rp. 210.000</dd>
+                    </div>
+                </dl>
+
+                <div>
+                    <p class="mt-4 font-reguler text-black text-sm">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore cupiditate odit ipsa necessitatibus? Consectetur eaque nostrum necessitatibus dicta numquam fugit, placeat facere possimus deserunt atque, earum accusamus ducimus est dolorum?
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4 mx-auto px-4">
+        <h3 class="text-black text-xl font-semibold mx-auto px-4 flex justify-start items-start">Tambah Aktifitas Lahan</h3>
+        <div class="mt-6 mb-6">
+            <article class="rounded-xl bg-white p-4 ring-3 ring-indigo-50 sm:p-6 lg:p-8">
+                <form>
+                    <select id="jenisAktifitas" class="select select-neutral">
+                        <option disabled selected>Jenis Aktifitas</option>
+                        <option value="pestisida">Penyiraman Pestisida</option>
+                        <option value="pupuk">Pemberian Pupuk</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+
+                    <!-- Form untuk Penyiraman Pestisida -->
+                    <div id="formPestisida" class="mt-4 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2">
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Nama Penyiram</legend>
+                                <input type="text" class="input" placeholder="Ucok" />
+                                <p class="label">Input nama penyiram</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tanggal Penyiraman</legend>
+                                <input type="text" id="datepicker" class="input input-bordered w-full">
+                                <p class="label">Input tanggal penyiraman</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Luas Lahan</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10 Hektar">
+                                <p class="label">Input luas lahan</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Biaya Penyiraman</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
+                                <p class="label">Input biaya penyiraman</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tambah Catatan</legend>
+                                <textarea class="textarea" placeholder="Catatan"></textarea>
+                                <p class="label">Opsional</p>
+                            </fieldset>
+                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
+                        </div>
+
+
+
+                    </div>
+
+                    <!-- Form untuk Pemberian Pupuk -->
+                    <div id="formPupuk" class="mt-4 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2">
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Nama Pemberi Pupuk</legend>
+                                <input type="text" class="input" placeholder="Ucok" />
+                                <p class="label">Input nama pemberi</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tanggal Pemupukan</legend>
+                                <input type="text" id="datepicker" class="input input-bordered w-full">
+                                <p class="label">Input tanggal pemupukan</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Jumlah Pupuk</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10 Karung">
+                                <p class="label">Input jumlah pupuk</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Biaya Pemupukan</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
+                                <p class="label">Input biaya pemupukan</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tambah Catatan</legend>
+                                <textarea class="textarea" placeholder="Catatan"></textarea>
+                                <p class="label">Opsional</p>
+                            </fieldset>
+                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
+                        </div>
+                    </div>
+
+                    <!-- Form untuk Lainnya -->
+                    <div id="formLainnya" class="mt-4 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2">
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Nama Aktifitas</legend>
+                                <input type="text" class="input" placeholder="Bersihin Lahan" />
+                                <p class="label">Input nama aktifitas</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tanggal</legend>
+                                <input type="text" id="datepicker" class="input input-bordered w-full">
+                                <p class="label">Input tanggal</p>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Jumlah</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10 Karung">
+                                <p class="label">Opsional</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Biaya</legend>
+                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
+                                <p class="label">Opsional</p>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Tambah Catatan</legend>
+                                <textarea class="textarea" placeholder="Catatan"></textarea>
+                                <p class="label">Opsional</p>
+                            </fieldset>
+                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
+                        </div>
+                    </div>
+                </form>
+
+            </article>
+        </div>
+    </div>
+
+    <script src="../javascript/maps.js"></script>
+    <script src="../javascript/other.js"></script>
+
+>>>>>>> 6e692d4 (indexs)
 </body>
 </html>

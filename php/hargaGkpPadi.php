@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +8,24 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="bg-white text-gray-800">
 
   <!-- Container -->
   <div class="max-w-md mx-auto p-4">
-     <p class="text-lg font-semibold mb-2">Harga GKP per 3 bulan</p>  
+    <p class="text-lg font-semibold mb-2">Harga GKP per 3 bulan</p>
     <!-- Chart Area -->
     <div class="bg-white rounded-xl p-2 md: shadow">
       <canvas id="hargaChart" class="w-full h-52"></canvas>
     </div>
 
- 
+
 
     <!-- Harga padi terkini -->
     <div class="bg-white md: shadow text-sm text-center py-2 rounded-lg mt-2">
-    Harga padi saat ini: <span class="font-semibold text-green-700">Rp 5.600/kg</span> <br>
-    (per 5 Juli 2025) <br>
-    halah nyocot
+      Harga padi saat ini: <span class="font-semibold text-green-700">Rp 5.600/kg</span> <br>
+      (per 5 Juli 2025) <br>
+      halah nyocot
     </div>
 
     <!-- Tombol Kembali Ke Dashboard Jang-->
@@ -34,6 +36,75 @@
     </div>
 
   </div>
+
+  <?php
+  // Ambil tanggal hari ini
+  function getHargaBerasHariIni()
+  {
+    $tanggal = date('d/m/Y');
+    $period = urlencode("$tanggal - $tanggal");
+
+    $url = "https://api-panelhargav2.badanpangan.go.id/api/front/harga-peta-provinsi?level_harga_id=1&komoditas_id=2&period_date=$period&multi_status_map[0]=&multi_province_id[0]=";
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTPHEADER => array(
+        'User-Agent: Mozilla/5.0',
+        'Accept: application/json'
+      )
+    ));
+
+    $response = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    if ($httpcode !== 200 || !$response) {
+      return null;
+    }
+
+    return json_decode($response, true);
+  }
+
+
+  // Cek jika API tidak bisa diakses
+  $data = getHargaBerasHariIni();
+
+  if (!$data || !isset($data['data'])) {
+    echo "<p class='text-red-600'>Gagal mengambil data dari API.</p>";
+    exit;
+  }
+
+
+  echo "<div class='w-full max-w-4xl'>";
+  echo "<h1 class='text-2xl font-bold text-green-800 mb-4'>Harga Beras Nasional Hari Ini ($tanggal)</h1>";
+  echo "<table class='table-auto w-full bg-white shadow-md rounded-lg overflow-hidden'>";
+  echo "<thead class='bg-green-600 text-white'>";
+  echo "<tr>
+        <th class='px-4 py-2 text-left'>Provinsi</th>
+        <th class='px-4 py-2 text-left'>Harga (Rp/kg)</th>
+      </tr>";
+  echo "</thead>";
+  echo "<tbody>";
+
+  foreach ($data['data'] as $item) {
+    $provinsi = $item['province_name'];
+    $harga = isset($item['harga']) ? number_format($item['harga'], 0, ',', '.') : 'Tidak tersedia';
+
+    echo "<tr class='border-b hover:bg-green-100'>";
+    echo "<td class='px-4 py-2'>$provinsi</td>";
+    echo "<td class='px-4 py-2'>Rp $harga</td>";
+    echo "</tr>";
+  }
+
+
+  echo "</tbody>";
+  echo "</table>";
+  echo "</div>";
+  ?>
 
   <!-- Chart Script -->
   <script>
@@ -118,5 +189,8 @@
     });
   </script>
 
+  <script src="../javascript/chart.js"></script>
+
 </body>
+
 </html>
