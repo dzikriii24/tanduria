@@ -1,10 +1,18 @@
 <?php
+session_start();
 include 'db.php';
 
-// Ambil data user ID 1 (sementara ditembak manual)
-$query = mysqli_query($conn, "SELECT * FROM user WHERE id = 1");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Ambil data user yang login
+$id_user = $_SESSION['user_id'];
+$query = mysqli_query($conn, "SELECT * FROM user WHERE id = $id_user");
 $user = mysqli_fetch_assoc($query);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
