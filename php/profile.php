@@ -37,7 +37,14 @@ $user = mysqli_fetch_assoc($query);
     <!-- Profil Section -->
     <div class="flex flex-col items-center">
       <!-- Foto Profil -->
-      <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-300 mb-4"></div>
+<div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-300 mb-4 overflow-hidden">
+  <?php if (!empty($user['foto']) && file_exists($user['foto'])): ?>
+    <img src="<?= $user['foto'] ?>" alt="Foto Profil" class="w-full h-full object-cover">
+  <?php else: ?>
+    <img src="uploads/default_user.jpg" alt="Default Foto" class="w-full h-full object-cover">
+  <?php endif; ?>
+</div>
+
 
       <!-- Nama dan Email -->
       <h2 class="text-xl md:text-2xl font-semibold"><?= htmlspecialchars($user['nama']) ?></h2>
