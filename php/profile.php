@@ -3,8 +3,8 @@ session_start();
 include 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+  header("Location: login.php");
+  exit();
 }
 
 // Ambil data user yang login
@@ -16,16 +16,16 @@ $user = mysqli_fetch_assoc($query);
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profil</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- CDN Icon (gunakan jika fi-* tidak muncul) -->
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-straight/css/uicons-solid-straight.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css">
+
+  <link rel="stylesheet" href="../css/icon.css">
 </head>
+
 <body class="bg-white min-h-screen flex flex-col">
 
   <!-- Container Full Width -->
@@ -37,13 +37,13 @@ $user = mysqli_fetch_assoc($query);
     <!-- Profil Section -->
     <div class="flex flex-col items-center">
       <!-- Foto Profil -->
-<div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-300 mb-4 overflow-hidden">
-  <?php if (!empty($user['foto']) && file_exists($user['foto'])): ?>
-    <img src="<?= $user['foto'] ?>" alt="Foto Profil" class="w-full h-full object-cover">
-  <?php else: ?>
-    <img src="uploads/default_user.jpg" alt="Default Foto" class="w-full h-full object-cover">
-  <?php endif; ?>
-</div>
+      <div class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-300 mb-4 overflow-hidden">
+        <?php if (!empty($user['foto']) && file_exists($user['foto'])): ?>
+          <img src="<?= $user['foto'] ?>" alt="Foto Profil" class="w-full h-full object-cover">
+        <?php else: ?>
+          <img src="uploads/default_user.jpg" alt="Default Foto" class="w-full h-full object-cover">
+        <?php endif; ?>
+      </div>
 
 
       <!-- Nama dan Email -->
@@ -70,52 +70,54 @@ $user = mysqli_fetch_assoc($query);
     </div>
 
     <!-- Tombol Update Profil -->
-<div class="mt-10">
-  <a href="update_profile.php">
-    <button class="w-full bg-[#2129B3] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-blue-900 transition">
-      Update Profil
-    </button>
-  </a>
-</div>
+    <div class="mt-10">
+      <a href="update_profile.php">
+        <button class="w-full bg-[#2129B3] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-blue-900 transition">
+          Update Profil
+        </button>
+      </a>
+    </div>
 
 
     <!-- Bottom Navigation -->
     <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-gray-200">
       <div class="grid grid-cols-5 text-center text-xs text-gray-500">
-          <!-- Home -->
-          <a href="index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all active-nav">
-              <i class="fi fi-sr-home text-lg text-blue-600"></i>
-              <span class="text-blue-600">Dashboard</span>
-          </a>
+        <!-- Home -->
+        <a href="../index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all active-nav">
+          <i class="fi fi-sr-home text-lg text-blue-600"></i>
+          <span class="text-blue-600">Dashboard</span>
+        </a>
 
-          <!-- Notifikasi -->
-          <a href="#" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-              <i class="fi fi-ss-bell text-lg"></i>
-              <span>Notifikasi</span>
-          </a>
+        <!-- Notifikasi -->
+        <a href="notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+          <i class="fi fi-ss-bell text-lg"></i>
+          <span>Notifikasi</span>
+        </a>
 
-          <!-- Lahan -->
-          <a href="php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-              <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg">
-                  <i class="fi fi-sr-land-layers text-xl"></i>
-              </div>
-              <span class="mt-1 text-blue-600">Lahan</span>
-          </a>
+        <!-- Lahan -->
+        <a href="lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+          <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
+            <i class="fi fi-sr-land-layers text-xl"></i>
+          </div>
+          <span class="mt-1">Lahan</span>
+        </a>
 
-          <!-- Edukasi -->
-          <a href="search.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-              <i class="fi fi-ss-book-open-cover text-lg"></i>
-              <span>Edukasi</span>
-          </a>
 
-          <!-- Profil -->
-          <a href="settings.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-              <i class="fi fi-sr-user text-lg"></i>
-              <span>Profil</span>
-          </a>
+        <!-- Edukasi -->
+        <a href="edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+          <i class="fi fi-ss-book-open-cover text-lg"></i>
+          <span>Edukasi</span>
+        </a>
+
+        <!-- Profil -->
+        <a href="profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
+          <i class="fi fi-sr-user text-lg"></i>
+          <span>Profil</span>
+        </a>
       </div>
     </div>
   </div>
 
 </body>
+
 </html>

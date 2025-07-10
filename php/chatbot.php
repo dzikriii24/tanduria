@@ -1,3 +1,17 @@
+<?php 
+
+$shortUrl = "https://maps.app.goo.gl/ARBAVcjn2TgpCN3s6";
+$ch = curl_init($shortUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // penting: follow redirect
+curl_exec($ch);
+$finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+curl_close($ch);
+
+echo "Final URL: " . $finalUrl;
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

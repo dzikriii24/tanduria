@@ -2,6 +2,7 @@
 require_once 'php/function/weatherAPI.php';
 require_once 'php/function/forecast.php';
 require_once 'php/function/helper.php';
+session_start();
 
 $apikey = '2de2de72b98b6a2f84c0b9a4042c43fe';
 $kota = 'Bandung';
@@ -55,6 +56,32 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
     $rekomendasi = "⚠️ Terlalu sering hujan. Tunda penanaman.";
 } else {
     $rekomendasi = "ℹ️ Kondisi belum ideal, perhatikan cuaca harian.";
+}
+
+$conn = new mysqli("localhost", "root", "", "tanduria");
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id']; // ⬅️ Ambil dari session
+    $gejala = $_POST['gejala'] ?? '';
+    $fotoName = '';
+
+    // Upload
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = 'uploads/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+        $fotoName = uniqid('foto_', true) . '.' . $ext;
+        move_uploaded_file($_FILES['foto']['tmp_name'], $uploadDir . $fotoName);
+    }
+
+    // Simpan
+    $stmt = $conn->prepare("INSERT INTO konsultasi (user_id, gejala, foto) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $user_id, $gejala, $fotoName);
+    $stmt->execute();
+
+    header("Location: index.php?success=1");
+    exit;
 }
 ?>
 
@@ -273,118 +300,118 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
 
     <!-- Fitur & Chatbot -->
     <div class="px-2 mx-auto rounded-xl">
-            <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 mb-30 bg-[#2C8F53] p-6 rounded-xl">
+        <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 mb-30 bg-[#2C8F53] p-6 rounded-xl">
 
-        <div class="grid grid-cols-2 gap-4 sm:gap-8  mx-auto">
-            <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
-                <div class="card bg-white hovers">
-                    <figure class="px-10 pt-10">
-                        <img
-                            src="asset/icon/lahan.svg"
-                            alt="Shoes"
-                            class="rounded-xl" />
-                    </figure>
-                    <div class="card-body items-center text-center">
-                        <h2 class="card-title">Kelola Lahan</h2>
-                        <p>title and actions parts</p>
+            <div class="grid grid-cols-2 gap-4 sm:gap-8  mx-auto">
+                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                    <div class="card bg-white hovers">
+                        <figure class="px-10 pt-10">
+                            <img
+                                src="asset/icon/lahan.svg"
+                                alt="Shoes"
+                                class="rounded-xl" />
+                        </figure>
+                        <div class="card-body items-center text-center">
+                            <h2 class="card-title">Kelola Lahan</h2>
+                            <p>title and actions parts</p>
+                        </div>
                     </div>
-                </div>
-            </a>
-            <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
-                <div class="card bg-white hovers">
-                    <figure class="px-10 pt-10">
-                        <img
-                            src="asset/icon/harga.svg"
-                            alt="Shoes"
-                            class="rounded-xl" />
-                    </figure>
-                    <div class="card-body items-center text-center">
-                        <h2 class="card-title">Prediksi Harga</h2>
-                        <p>title and actions parts</p>
+                </a>
+                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                    <div class="card bg-white hovers">
+                        <figure class="px-10 pt-10">
+                            <img
+                                src="asset/icon/harga.svg"
+                                alt="Shoes"
+                                class="rounded-xl" />
+                        </figure>
+                        <div class="card-body items-center text-center">
+                            <h2 class="card-title">Prediksi Harga</h2>
+                            <p>title and actions parts</p>
+                        </div>
                     </div>
-                </div>
-            </a>
-            <a href="php/chatbot.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
-                <div class="card bg-white hovers">
-                    <figure class="px-10 pt-10">
-                        <img
-                            src="asset/icon/chatbot.svg"
-                            alt="Shoes"
-                            class="rounded-xl" />
-                    </figure>
-                    <div class="card-body items-center text-center">
-                        <h2 class="card-title">Chatbot</h2>
-                        <p>title saasdasdasdasdas</p>
+                </a>
+                <a href="php/chatbot.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                    <div class="card bg-white hovers">
+                        <figure class="px-10 pt-10">
+                            <img
+                                src="asset/icon/chatbot.svg"
+                                alt="Shoes"
+                                class="rounded-xl" />
+                        </figure>
+                        <div class="card-body items-center text-center">
+                            <h2 class="card-title">Chatbot</h2>
+                            <p>title saasdasdasdasdas</p>
+                        </div>
                     </div>
-                </div>
-            </a>
-            <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
-                <div class="card bg-white hovers">
-                    <figure class="px-10 pt-10">
-                        <img
-                            src="asset/icon/planing.svg"
-                            alt="Shoes"
-                            class="rounded-xl" />
-                    </figure>
-                    <div class="card-body items-center text-center">
-                        <h2 class="card-title">Perencanaan</h2>
-                        <p>title and actions parts</p>
+                </a>
+                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                    <div class="card bg-white hovers">
+                        <figure class="px-10 pt-10">
+                            <img
+                                src="asset/icon/planing.svg"
+                                alt="Shoes"
+                                class="rounded-xl" />
+                        </figure>
+                        <div class="card-body items-center text-center">
+                            <h2 class="card-title">Perencanaan</h2>
+                            <p>title and actions parts</p>
+                        </div>
                     </div>
-                </div>
-            </a>
-        </div>
-        <div class="">
-            <div class="space-y-6">
-                <!-- Katalog Penyakit -->
-                <article class="overflow-hidden rounded-lg text-white bg-[#1D6034] shadow-xs px-4 mx-auto p-4">
-                    <div class="">
-                        <a href="#">
-                            <h3 class="text-lg font-medium">
-                                Penyakit & Hama Umum
-                            </h3>
-                        </a>
-
-                        <ul class="list-disc list-inside space-y-1 text-sm">
-                            <li>Wereng Coklat</li>
-                            <li>Blast (Hawar Daun)</li>
-                            <li>Penggerek Batang</li>
-                            <li>Busuk Akar</li>
-                        </ul>
-
-                        <a href="#" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#fff] hover:underline">
-                            Lihat Semua Daftar Penyakit
-
-                            <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180">
-                                &rarr;
-                            </span>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Form Konsultasi Manual -->
-                <div class="bg-white rounded-xl shadow p-4">
-                    <h3 class="text-lg font-semibold text-[#1D6034] mb-2">📤 Konsultasi Manual</h3>
-                    <form action="dokterpadi_backend.php" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <fieldset class="fieldset">
-                            <legend class="fieldset-legend">Deskripsikan Gejalanya</legend>
-                            <textarea class="textarea h-24" placeholder="Daun menguning sejak 3 hari ..." required name="gejala"></textarea>
-                            <div class="label">Tunggu response di notifikasi</div>
-                        </fieldset>
-                        <fieldset class="fieldset">
-                            <legend class="fieldset-legend">Upload Foto</legend>
-                            <input type="file" class="file-input"  name="foto" accept="image/*"/>
-                            <label class="label">Opsional</label>
-                        </fieldset>
-                        <button type="submit" class="bg-[#2C8F53] hover:bg-[#1D6034] text-white px-4 py-2 rounded">
-                            Kirim Konsultasi
-                        </button>
-                    </form>
-                </div>
-
+                </a>
             </div>
-        </div>
+            <div class="">
+                <div class="space-y-6">
+                    <!-- Katalog Penyakit -->
+                    <article class="overflow-hidden rounded-lg text-white bg-[#1D6034] shadow-xs px-4 mx-auto p-4">
+                        <div class="">
+                            <a href="#">
+                                <h3 class="text-lg font-medium">
+                                    Penyakit & Hama Umum
+                                </h3>
+                            </a>
 
-    </div>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li>Wereng Coklat</li>
+                                <li>Blast (Hawar Daun)</li>
+                                <li>Penggerek Batang</li>
+                                <li>Busuk Akar</li>
+                            </ul>
+
+                            <a href="#" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#fff] hover:underline">
+                                Lihat Semua Daftar Penyakit
+
+                                <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180">
+                                    &rarr;
+                                </span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Form Konsultasi Manual -->
+                    <div class="bg-white rounded-xl shadow p-4">
+                        <h3 class="text-lg font-semibold text-[#1D6034] mb-2">📤 Konsultasi Manual</h3>
+                        <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Deskripsikan Gejalanya</legend>
+                                <textarea class="textarea h-24" placeholder="Daun menguning sejak 3 hari ..." required name="gejala"></textarea>
+                                <div class="label">Tunggu response di notifikasi</div>
+                            </fieldset>
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Upload Foto</legend>
+                                <input type="file" class="file-input" name="foto" accept="image/*" />
+                                <label class="label">Opsional</label>
+                            </fieldset>
+                            <button type="submit" class="bg-[#2C8F53] hover:bg-[#1D6034] text-white px-4 py-2 rounded">
+                                Kirim Konsultasi
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
     </div>
 
     </div>
@@ -403,7 +430,7 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
             </a>
 
             <!-- Bookmark -->
-            <a href="" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+            <a href="php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
                 <i class="fi fi-ss-bell text-lg"></i>
                 <span>Notifikasi</span>
             </a>
@@ -426,10 +453,22 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>
+            
         </div>
     </div>
 
     <!-- Jotform AI Chatbot -->
+    <script>
+        const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+
+        document.getElementById('formKonsultasi').addEventListener('submit', function(e) {
+            if (!isLoggedIn) {
+                e.preventDefault();
+                alert("Anda harus login terlebih dahulu untuk mengirim konsultasi.");
+                window.location.href = "php/login.php"; // redirect ke login jika ingin
+            }
+        });
+    </script>
 
 
 
@@ -440,7 +479,8 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
 
 
 
-    <script src="javascript/chart.js"></script>
+
+<script src="javascript/chart.js"></script>
     <script src="javascript/index.js"></script>
 </body>
 

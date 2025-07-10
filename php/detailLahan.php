@@ -22,12 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $tanggal   = $_POST['tanggal'] ?? '';
   $pelaksana = $_POST['pelaksana'] ?? '';
   $jumlah    = $_POST['jumlah'] ?? '';
+  $luas = $_POST['luas'] ?? '';
   $biaya     = (int) ($_POST['biaya'] ?? 0);
   $catatan   = $_POST['catatan'] ?? '';
 
-  $stmt = $conn->prepare("INSERT INTO aktivitas_lahan (lahan_id, jenis_aktivitas, tanggal, pelaksana, jumlah, biaya, catatan)
-                          VALUES (?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("issssis", $id, $jenis, $tanggal, $pelaksana, $jumlah, $biaya, $catatan);
+  $stmt = $conn->prepare("INSERT INTO aktivitas_lahan (lahan_id, jenis_aktivitas, tanggal, pelaksana, jumlah, luas, biaya, catatan)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("isssssis", $id, $jenis, $tanggal, $pelaksana, $jumlah, $luas, $biaya, $catatan);
   $stmt->execute();
   header("Location: detailLahan.php?id=$id&success=1");
   exit;
@@ -62,35 +63,26 @@ $aktivitas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body class="bg-white">
-<?php if ($showSuccessAlert): ?>
-  <script>
-    Swal.fire({
-      icon: 'success',
-      title: 'Berhasil!',
-      text: 'Aktivitas berhasil disimpan.',
-      confirmButtonColor: '#3085d6'
-    });
+  <?php if ($showSuccessAlert): ?>
+    <script>
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: 'Aktivitas berhasil disimpan.',
+        confirmButtonColor: '#3085d6'
+      });
 
-    
-    // Hapus parameter ?success=1 dari URL
-    if (window.history.replaceState) {
-      const url = new URL(window.location);
-      url.searchParams.delete('success');
-      window.history.replaceState({}, document.title, url);
-    }
-  </script>
-<?php endif; ?>
+
+      // Hapus parameter ?success=1 dari URL
+      if (window.history.replaceState) {
+        const url = new URL(window.location);
+        url.searchParams.delete('success');
+        window.history.replaceState({}, document.title, url);
+      }
+    </script>
+  <?php endif; ?>
 
   <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
-  <a href="lahan.php"
-   class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-       xmlns="http://www.w3.org/2000/svg">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-  </svg>
-  Kembali ke Daftar Lahan
-</a>
-
     <div class="grid grid-cols-1 gap-4 md:grid-cols-4 md:items-center md:gap-8 mt-4">
       <div class="md:col-span-3">
         <img src="uploads/<?= htmlspecialchars($lahan['foto_lahan']) ?>" class="rounded w-full h-[400px] object-cover" alt="<?= htmlspecialchars($lahan['nama_lahan']) ?>" />
@@ -168,6 +160,20 @@ $aktivitas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <a href="<?= htmlspecialchars($lahan['link_maps']) ?>" class="text-blue-600 hover:underline" target="_blank">Lihat Lokasi</a>
           </dd>
         </div>
+
+        <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+          <dt class="font-medium text-gray-900">Prediksi Hasil Tanam</dt>
+          <dd class="text-gray-700 sm:col-span-2">
+            <a href="<?= htmlspecialchars($lahan['link_maps']) ?>" class="text-blue-600 hover:underline" target="_blank">Lihat Lokasi</a>
+          </dd>
+        </div>
+
+        <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+          <dt class="font-medium text-gray-900">Hasil Bersih</dt>
+          <dd class="text-gray-700 sm:col-span-2">
+            <a href="<?= htmlspecialchars($lahan['link_maps']) ?>" class="text-blue-600 hover:underline" target="_blank">Lihat Lokasi</a>
+          </dd>
+        </div>
       </dl>
     </div>
   </div>
@@ -181,234 +187,128 @@ $aktivitas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
   <?php endif; ?>
 
   <!-- Tambah Aktivitas -->
-<div class="mt-10 px-4">
-  <h2 class="text-xl font-semibold text-gray-800 mb-4">Tambah Aktivitas Lahan</h2>
-  <form method="post" class="space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium">Jenis Aktivitas</label>
-        <select name="jenis" required class="w-full border border-gray-300 rounded px-3 py-2">
-          <option value="Pemupukan">Pemupukan</option>
-          <option value="Penyemprotan">Penyemprotan Pestisida</option>
-          <option value="Pengairan">Pengairan</option>
-          <option value="Lainnya">Lainnya</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Tanggal</label>
-        <input type="date" name="tanggal" required class="w-full border border-gray-300 rounded px-3 py-2">
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Pelaksana</label>
-        <input type="text" name="pelaksana" required class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Ucok / Mang Ujang">
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Jumlah (opsional)</label>
-        <input type="text" name="jumlah" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="10 karung / 5 liter">
-      </div>
-      <div>
-        <label class="block text-sm font-medium">Biaya (Rp)</label>
-        <input type="number" name="biaya" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="10000">
-      </div>
-      <div class="sm:col-span-2">
-        <label class="block text-sm font-medium">Catatan</label>
-        <textarea name="catatan" rows="3" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Deskripsi aktivitas..."></textarea>
-      </div>
-    </div>
-    <button type="submit" class="mt-4 px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Simpan Aktivitas</button>
-  </form>
+  <div class="mt-10 px-4">
+    <!-- Daftar Aktivitas -->
+    <div class="mt-4 mx-auto px-4">
+      <h3 class="text-black text-xl font-semibold">Riwayat Aktivitas Lahan</h3>
 
-<<<<<<< HEAD
- <!-- Daftar Aktivitas -->
- <div class="mt-4 mx-auto px-4">
-    <h3 class="text-black text-xl font-semibold mx-auto px-4 flex justify-start items-start">Riwayat Aktivitas Lahan</h3>
-    <?php if (count($aktivitas) === 0): ?>
-      <p class="text-gray-600 mt-2">Belum ada aktivitas tercatat.</p>
-    <?php else: ?>
-      <div class="grid sm:grid-cols-2 gap-4 mt-4">
-        <?php foreach ($aktivitas as $act): ?>
-          <div class="block rounded-md border border-gray-300 p-4 shadow-sm sm:p-6 bg-gray-50">
-            <div class="flex justify-between items-start">
+      <?php if (count($aktivitas) === 0): ?>
+        <p class="text-gray-600 mt-2">Belum ada aktivitas tercatat.</p>
+      <?php else: ?>
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <?php foreach ($aktivitas as $act): ?>
+            <div class="block rounded-md border border-gray-300 p-4 shadow-sm sm:p-6 bg-gray-50">
               <div>
                 <h3 class="text-lg font-semibold text-gray-900">
                   <?= htmlspecialchars($act['jenis_aktivitas']) ?>
                 </h3>
-                <p class="text-sm text-gray-700">Pelaksana: <?= htmlspecialchars($act['pelaksana']) ?></p>
-                <?php if ($act['jumlah']): ?><p class="text-sm text-gray-700">Jumlah: <?= htmlspecialchars($act['jumlah']) ?></p><?php endif; ?>
-                <?php if ($act['biaya'] > 0): ?><p class="text-sm text-gray-700">Biaya: Rp. <?= number_format($act['biaya'], 0, ',', '.') ?></p><?php endif; ?>
-                <?php if ($act['catatan']): ?><p class="text-sm text-gray-700 mt-1"><?= nl2br(htmlspecialchars($act['catatan'])) ?></p><?php endif; ?>
+                <p class="mt-1 text-sm text-gray-700">Oleh <?= htmlspecialchars($act['pelaksana']) ?></p>
               </div>
-              <div class="text-sm text-right text-gray-500 whitespace-nowrap">
-                <?= date('d M Y', strtotime($act['tanggal'])) ?>
-              </div>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-  </div>
-  <br>
-<p>alamak oyy kajung ruan</p>
-</div>
-=======
-                        <p class="mt-1 text-sm text-gray-700">Oleh Mang Ujang</p>
-                    </div>
+
+              <dl class="mt-6 flex gap-4 lg:gap-6">
+                <div>
+                  <dt class="text-sm font-medium text-gray-700">Tanggal</dt>
+                  <dd class="text-xs text-gray-700">
+                    <p class="mt-1 text-sm text-gray-700"><?= htmlspecialchars($act['tanggal']) ?></p>
+                  </dd>
                 </div>
-
-                <dl class="mt-6 flex gap-4 lg:gap-6">
-                    <div>
-                        <dt class="text-sm font-medium text-gray-700">Tanggal</dt>
-
-                        <dd class="text-xs text-gray-700">31/06/2025</dd>
-                    </div>
-
-                    <div>
-                        <dt class="text-sm font-medium text-gray-700">Jumlah</dt>
-
-                        <dd class="text-xs text-gray-700">10 Karung</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-700">Biaya</dt>
-
-                        <dd class="text-xs text-gray-700">Rp. 210.000</dd>
-                    </div>
-                </dl>
 
                 <div>
-                    <p class="mt-4 font-reguler text-black text-sm">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore cupiditate odit ipsa necessitatibus? Consectetur eaque nostrum necessitatibus dicta numquam fugit, placeat facere possimus deserunt atque, earum accusamus ducimus est dolorum?
-                    </p>
+                  <dt class="text-sm font-medium text-gray-700">Jumlah</dt>
+                  <dd class="text-xs text-gray-700">
+                    <p><?= htmlspecialchars($act['jumlah'] ?: $act['luas']) ?></p>
+                  </dd>
                 </div>
+
+                <div>
+                  <dt class="text-sm font-medium text-gray-700">Biaya</dt>
+                  <dd class="text-xs text-gray-700">
+                    <?php if ($act['biaya'] > 0): ?>
+                      <p>Rp. <?= number_format($act['biaya'], 0, ',', '.') ?></p>
+                    <?php else: ?>
+                      <p>-</p>
+                    <?php endif; ?>
+                  </dd>
+                </div>
+              </dl>
+
+              <div class="mt-4">
+                <?php if (!empty($act['catatan'])): ?>
+                  <p class="text-sm text-gray-700 italic border-l-4 border-blue-400 pl-3"><?= nl2br(htmlspecialchars($act['catatan'])) ?></p>
+                <?php endif; ?>
+              </div>
             </div>
+          <?php endforeach; ?>
         </div>
-
+      <?php endif; ?>
     </div>
-
-    <div class="mt-4 mx-auto px-4">
-        <h3 class="text-black text-xl font-semibold mx-auto px-4 flex justify-start items-start">Tambah Aktifitas Lahan</h3>
-        <div class="mt-6 mb-6">
-            <article class="rounded-xl bg-white p-4 ring-3 ring-indigo-50 sm:p-6 lg:p-8">
-                <form>
-                    <select id="jenisAktifitas" class="select select-neutral">
-                        <option disabled selected>Jenis Aktifitas</option>
-                        <option value="pestisida">Penyiraman Pestisida</option>
-                        <option value="pupuk">Pemberian Pupuk</option>
-                        <option value="lainnya">Lainnya</option>
-                    </select>
-
-                    <!-- Form untuk Penyiraman Pestisida -->
-                    <div id="formPestisida" class="mt-4 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-2">
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Nama Penyiram</legend>
-                                <input type="text" class="input" placeholder="Ucok" />
-                                <p class="label">Input nama penyiram</p>
-                            </fieldset>
-
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tanggal Penyiraman</legend>
-                                <input type="text" id="datepicker" class="input input-bordered w-full">
-                                <p class="label">Input tanggal penyiraman</p>
-                            </fieldset>
-
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Luas Lahan</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10 Hektar">
-                                <p class="label">Input luas lahan</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Biaya Penyiraman</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
-                                <p class="label">Input biaya penyiraman</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tambah Catatan</legend>
-                                <textarea class="textarea" placeholder="Catatan"></textarea>
-                                <p class="label">Opsional</p>
-                            </fieldset>
-                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
-                        </div>
+  </div>
 
 
+  <div class="mt-4 mx-auto px-4">
+    <h3 class="text-black text-xl font-semibold mx-auto px-4 flex justify-start items-start">Tambah Aktifitas Lahan</h3>
+    <div class="mt-6 mb-6">
+      <article class="rounded-xl bg-white p-4 ring-3 ring-indigo-50 sm:p-6 lg:p-8">
+        <form method="post" id="aktifitasForm">
+          <!-- Form untuk Lainnya -->
+          <div id="formLainnya" class="mt-4">
 
-                    </div>
+            <!-- Taruh di luar grid agar tidak menyebabkan offset layout -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Jenis Aktivitas</label>
+              <select id="jenisAktifitas" name="jenis" class="w-full border border-gray-300 rounded px-3 py-2" required>
+                <option disabled selected>Jenis Aktivitas</option>
+                <option value="Penyiraman Pestisida">Penyiraman Pestisida</option>
+                <option value="Pemberian Pupuk">Pemberian Pupuk</option>
+                <option value="lainnya">Lainnya</option>
+              </select>
+            </div>
 
-                    <!-- Form untuk Pemberian Pupuk -->
-                    <div id="formPupuk" class="mt-4 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-2">
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Nama Pemberi Pupuk</legend>
-                                <input type="text" class="input" placeholder="Ucok" />
-                                <p class="label">Input nama pemberi</p>
-                            </fieldset>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Nama Pelaksana</legend>
+                <input type="text" class="input" placeholder="Ucok" name="pelaksana" />
+                <p class="label">Input nama pelaksana</p>
+              </fieldset>
 
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tanggal Pemupukan</legend>
-                                <input type="text" id="datepicker" class="input input-bordered w-full">
-                                <p class="label">Input tanggal pemupukan</p>
-                            </fieldset>
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Tanggal</legend>
+                <input type="date" id="datepicker" class="input input-bordered w-full" name="tanggal">
+                <p class="label">Input tanggal</p>
+              </fieldset>
 
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Jumlah Pupuk</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10 Karung">
-                                <p class="label">Input jumlah pupuk</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Biaya Pemupukan</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
-                                <p class="label">Input biaya pemupukan</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tambah Catatan</legend>
-                                <textarea class="textarea" placeholder="Catatan"></textarea>
-                                <p class="label">Opsional</p>
-                            </fieldset>
-                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
-                        </div>
-                    </div>
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Jumlah</legend>
+                <input type="text" class="input input-bordered w-full" placeholder="10 Karung" name="jumlah">
+                <p class="label">Opsional</p>
+              </fieldset>
 
-                    <!-- Form untuk Lainnya -->
-                    <div id="formLainnya" class="mt-4 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-2">
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Nama Aktifitas</legend>
-                                <input type="text" class="input" placeholder="Bersihin Lahan" />
-                                <p class="label">Input nama aktifitas</p>
-                            </fieldset>
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Biaya</legend>
+                <input type="number" class="input input-bordered w-full" placeholder="10.000" name="biaya">
+                <p class="label">Opsional</p>
+              </fieldset>
 
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tanggal</legend>
-                                <input type="text" id="datepicker" class="input input-bordered w-full">
-                                <p class="label">Input tanggal</p>
-                            </fieldset>
+              <fieldset class="fieldset sm:col-span-2">
+                <legend class="fieldset-legend">Tambah Catatan</legend>
+                <textarea class="textarea" placeholder="Catatan" name="catatan"></textarea>
+                <p class="label">Opsional</p>
+              </fieldset>
+              <button class="btn btn-soft btn-success w-50 mt-10" type="submit">Tambah Aktivitas</button>
+            </div>
 
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Jumlah</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10 Karung">
-                                <p class="label">Opsional</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Biaya</legend>
-                                <input type="text" class="input input-bordered w-full" placeholder="10.000">
-                                <p class="label">Opsional</p>
-                            </fieldset>
-                            <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Tambah Catatan</legend>
-                                <textarea class="textarea" placeholder="Catatan"></textarea>
-                                <p class="label">Opsional</p>
-                            </fieldset>
-                            <button class="btn btn-soft btn-success w-50 mt-10 ">Tambah Aktifitas</button>
-                        </div>
-                    </div>
-                </form>
+          </div>
 
-            </article>
-        </div>
+
+        </form>
+
+      </article>
     </div>
+  </div>
 
-    <script src="../javascript/maps.js"></script>
-    <script src="../javascript/other.js"></script>
 
->>>>>>> 6e692d4 (indexs)
+  <script src="../javascript/maps.js"></script>
+  <script src="../javascript/other.js"></script>
 </body>
+
 </html>
