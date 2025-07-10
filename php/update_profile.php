@@ -1,30 +1,63 @@
 <?php
+session_start();
 include 'db.php';
 
-// Ambil data user ID 1
-$query = mysqli_query($conn, "SELECT * FROM user WHERE id = 1");
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$id_user = $_SESSION['user_id'];
+
+// Ambil data user sekarang
+$query = mysqli_query($conn, "SELECT * FROM user WHERE id = $id_user");
 $user = mysqli_fetch_assoc($query);
 
-// Proses saat form disubmit
+// Proses jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama         = $_POST['nama'];
-    $email        = $_POST['email'];
-    $no_telepon   = $_POST['no_telepon'];
+    $nama = $_POST['nama'];
+    $no_telepon = $_POST['no_telepon'];
     $jenis_kelamin = $_POST['jenis_kelamin'];
 
-    $update = mysqli_query($conn, "UPDATE user SET 
-        nama = '$nama', 
-        email = '$email', 
-        no_telepon = '$no_telepon', 
-        jenis_kelamin = '$jenis_kelamin' 
-        WHERE id = 1
-    ");
+    // Cek apakah ada file foto diupload
+    if (!empty($_FILES['foto']['name'])) {
+        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+        $nama_file = 'foto_' . time() . '.' . $ext;
+        $lokasi = 'uploads/' . $nama_file;
 
-    if ($update) {
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $lokasi)) {
+            // Hapus foto lama kalau ada
+            if (!empty($user['foto']) && file_exists($user['foto'])) {
+                unlink($user['foto']);
+            }
+
+            // Simpan juga foto
+            $query_update = "UPDATE user SET 
+                                nama='$nama', 
+                                no_telepon='$no_telepon', 
+                                jenis_kelamin='$jenis_kelamin',
+                                foto='$lokasi' 
+                            WHERE id=$id_user";
+        }
+    }
+
+    // Jika tidak upload foto, update data lain saja
+    if (!isset($query_update)) {
+        $query_update = "UPDATE user SET 
+                            nama='$nama', 
+                            no_telepon='$no_telepon', 
+                            jenis_kelamin='$jenis_kelamin' 
+                        WHERE id=$id_user";
+    }
+
+    // Jalankan query
+    if (mysqli_query($conn, $query_update)) {
         header("Location: profile.php");
         exit();
     } else {
-        echo "<script>alert('Gagal update data');</script>";
+        echo "Query error: " . mysqli_error($conn);
+        exit();
     }
 }
 ?>
@@ -44,55 +77,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h1 class="text-3xl md:text-4xl font-semibold">Update Profil</h1>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="space-y-6">
-      <!-- Nama -->
-      <div>
-        <label class="block mb-1 font-medium">Nama Lengkap</label>
-        <input type="text" name="nama" value="<?= htmlspecialchars($user['nama']) ?>" required
-               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
+    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+  <!-- Nama -->
+  <div>
+    <label class="block mb-1 font-medium">Nama Lengkap</label>
+    <input type="text" name="nama" value="<?= $user['nama'] ?>" required class="w-full border rounded-lg px-4 py-2" />
+  </div>
 
-      <!-- Email -->
-      <div>
-        <label class="block mb-1 font-medium">Email</label>
-        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required
-               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
+  <!-- No. Telepon -->
+  <div>
+    <label class="block mb-1 font-medium">No. Telepon</label>
+    <input type="text" name="no_telepon" value="<?= $user['no_telepon'] ?>" required class="w-full border rounded-lg px-4 py-2" />
+  </div>
 
-      <!-- Nomor Telepon -->
-      <div>
-        <label class="block mb-1 font-medium">Nomor Telepon</label>
-        <input type="text" name="no_telepon" value="<?= htmlspecialchars($user['no_telepon']) ?>" required
-               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
+  <!-- Jenis Kelamin -->
+  <div>
+    <label class="block mb-1 font-medium">Jenis Kelamin</label>
+    <select name="jenis_kelamin" required class="w-full border rounded-lg px-4 py-2">
+      <option value="Laki-laki" <?= $user['jenis_kelamin'] == 'Laki-laki' ? 'selected' : '' ?>>Laki-laki</option>
+      <option value="Perempuan" <?= $user['jenis_kelamin'] == 'Perempuan' ? 'selected' : '' ?>>Perempuan</option>
+    </select>
+  </div>
 
-      <!-- Jenis Kelamin -->
-      <div>
-        <label class="block mb-1 font-medium">Jenis Kelamin</label>
-        <select name="jenis_kelamin" required
-                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option value="">-- Pilih --</option>
-          <option value="Laki-laki" <?= $user['jenis_kelamin'] === 'Laki-laki' ? 'selected' : '' ?>>Laki-laki</option>
-          <option value="Perempuan" <?= $user['jenis_kelamin'] === 'Perempuan' ? 'selected' : '' ?>>Perempuan</option>
-        </select>
-      </div>
+  <!-- Upload Foto -->
+  <div>
+    <label class="block mb-1 font-medium">Foto Baru (Opsional)</label>
+    <input type="file" name="foto" accept="image/*" class="w-full border rounded-lg px-4 py-2" />
+  </div>
 
-      <!-- Tombol Simpan -->
-      <div class="pt-4">
-        <button type="submit"
-                class="w-full bg-[#2129B3] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-blue-900 transition">
-          Simpan Perubahan
-        </button>
-      </div>
-      <!-- Tombol Kembali -->
-<div class="pt-3">
-  <a href="profile.php"
-     class="block text-center w-full bg-gray-200 text-gray-700 font-medium py-3 rounded-lg text-base md:text-lg hover:bg-gray-300 transition">
-    Kembali
-  </a>
-</div>
+  <!-- Tombol -->
+  <div class="flex justify-between mt-6 gap-4">
+    <a href="profile.php" class="w-1/2 text-center bg-gray-200 py-3 rounded-lg hover:bg-gray-300">Kembali</a>
+    <button type="submit" class="w-1/2 bg-[#2129B3] text-white py-3 rounded-lg hover:bg-blue-900">
+      Simpan Perubahan
+    </button>
+  </div>
+</form>
 
-    </form>
   </div>
 
 </body>

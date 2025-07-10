@@ -1,44 +1,53 @@
 <?php
+session_start();
 include 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Ambil data dari form
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama          = $_POST['nama'];
     $email         = $_POST['email'];
+    $password      = $_POST['password'];
     $no_telepon    = $_POST['no_telepon'];
     $jenis_kelamin = $_POST['jenis_kelamin'];
-    $password      = password_hash($_POST['password'], PASSWORD_DEFAULT); // Enkripsi
+    $lokasi_otomatis = $_POST['lokasi'];
+    $lokasi_manual   = $_POST['lokasi_manual'];
 
-    // Inisialisasi nama file (default kosong)
-    $foto = '';
+    // Lokasi yang dipilih: otomatis jika ada, manual kalau tidak
+    $lokasi = !empty($lokasi_otomatis) ? $lokasi_otomatis : $lokasi_manual;
 
-    // Proses upload foto jika ada
-    if ($_FILES['foto']['name']) {
-        $ext  = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+    // Hash password (bisa diganti dengan bcrypt atau lainnya)
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Handle upload foto
+    $foto_path = "";
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
         $nama_file = 'foto_' . time() . '.' . $ext;
-        $lokasi = 'uploads/' . $nama_file;
+        $upload_dir = 'uploads/';
+        $lokasi_file = $upload_dir . $nama_file;
 
-        if (move_uploaded_file($_FILES['foto']['tmp_name'], $lokasi)) {
-            $foto = $lokasi;
+        // Pastikan folder upload tersedia
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $lokasi_file)) {
+            $foto_path = $lokasi_file;
         }
     }
 
-    // Simpan ke database
-    $query = "INSERT INTO user (nama, email, no_telepon, jenis_kelamin, password, foto)
-              VALUES ('$nama', '$email', '$no_telepon', '$jenis_kelamin', '$password', '$foto')";
+    // Query INSERT dengan kolom dan nilai sesuai
+    $query = "INSERT INTO user (nama, email, password, no_telepon, jenis_kelamin, foto, lokasi)
+              VALUES ('$nama', '$email', '$hashed_password', '$no_telepon', '$jenis_kelamin', '$foto_path', '$lokasi')";
 
-    $simpan = mysqli_query($conn, $query);
-
-   if ($simpan) {
-    echo "<script>
-        alert('Pendaftaran berhasil! Silakan login.');
-        window.location='login.php';
-    </script>";
-    exit();
-}
-
+    if (mysqli_query($conn, $query)) {
+        header("Location: login.php");
+        exit();
+    } else {
+        echo "Gagal daftar: " . mysqli_error($conn);
+    }
 }
 ?>
+
 
 <!-- UI Daftar (HTML sama seperti sebelumnya) -->
 <!DOCTYPE html>
@@ -95,6 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="file" name="foto" accept="image/*"
                class="w-full border border-gray-300 rounded-lg px-4 py-2 file:bg-[#2129B3] file:text-white file:px-4 file:py-2 file:rounded-md file:border-0 hover:file:bg-blue-900" />
       </div>
+      <!-- Lokasi otomatis (hidden) -->
+<input type="hidden" name="lokasi" id="lokasi">
 
       <!-- Tombol Daftar -->
       <div>
@@ -113,4 +124,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
 </body>
+<script>
+  window.onload = function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        document.getElementById('lokasi').value =
+          pos.coords.latitude + ',' + pos.coords.longitude;
+      });
+    }
+  };
+</script>
+
 </html>
