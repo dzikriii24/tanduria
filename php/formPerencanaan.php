@@ -2,147 +2,154 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Form Perencanaan - Tanduria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tambah Perencanaan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-4xl mx-auto p-8 mt-10 bg-white shadow-lg rounded-2xl">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Tambah Perencanaan</h2>
 
-  <div class="max-w-4xl mx-auto px-4 py-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Tambah Perencanaan</h2>
-
-    <form id="formPerencanaan" onsubmit="return handlePerencanaan(event)" class="bg-white p-6 rounded-2xl shadow-md space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        <!-- Nama Rencana -->
-        <div>
-          <label for="namaRencana" class="text-sm font-medium text-gray-700 mb-1">Nama Rencana</label>
-          <input type="text" id="namaRencana" name="namaRencana" placeholder="Contoh: Penanaman Musim Hujan"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:ring-green-500 focus:outline-none">
-        </div>
-
-        <!-- Jenis Kegiatan -->
-        <div>
-          <label for="jenisKegiatan" class="text-sm font-medium text-gray-700 mb-1">Jenis Kegiatan</label>
-          <select id="jenisKegiatan" name="jenisKegiatan"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:ring-green-500 focus:outline-none">
-            <option value="">Pilih Kegiatan</option>
-            <option value="Penanaman">Penanaman</option>
-            <option value="Pemupukan">Pemupukan</option>
-            <option value="Penyemprotan">Penyemprotan</option>
-            <option value="Panen">Panen</option>
-          </select>
-        </div>
-
-        <!-- Tanggal Mulai -->
-        <div>
-          <label for="tanggalMulai" class="text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-          <input type="date" id="tanggalMulai" name="tanggalMulai"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:ring-green-500 focus:outline-none">
-        </div>
-
-        <!-- Tanggal Selesai -->
-        <div>
-          <label for="tanggalSelesai" class="text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
-          <input type="date" id="tanggalSelesai" name="tanggalSelesai"
-            class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:ring-green-500 focus:outline-none">
-        </div>
-
-        <!-- Catatan -->
-        <div class="md:col-span-2">
-          <label for="catatan" class="text-sm font-medium text-gray-700 mb-1">Catatan Tambahan</label>
-          <textarea id="catatan" name="catatan" rows="4" placeholder="Tulis catatan penting di sini..."
-            class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"></textarea>
-        </div>
+    <form id="formRencana" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Nama Rencana -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Nama Rencana</label>
+        <input type="text" name="namaRencana" placeholder="Contoh: Penanaman Musim Hujan" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
       </div>
 
-      <!-- Tombol -->
-      <div class="pt-4">
-        <button type="submit"
-          class="inline-flex items-center justify-center rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700 transition duration-300">
-          <svg class="h-5 w-5 mr-2 -ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-          Simpan Rencana
+      <!-- Jenis Kegiatan -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Jenis Kegiatan</label>
+        <select name="jenisKegiatan" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+          <option value="">Pilih Kegiatan</option>
+          <option value="Penanaman">Penanaman</option>
+          <option value="Pemanenan">Pemanenan</option>
+          <option value="Pemupukan">Pemupukan</option>
+        </select>
+      </div>
+
+      <!-- Tanggal Mulai -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Tanggal Mulai</label>
+        <input type="date" name="tanggalMulai" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Tanggal Selesai -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Tanggal Selesai</label>
+        <input type="date" name="tanggalSelesai" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Catatan Tambahan -->
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 font-semibold mb-2">Catatan Tambahan</label>
+        <textarea name="catatan" placeholder="Tulis catatan penting di sini…" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"></textarea>
+      </div>
+
+      <!-- Luas Lahan -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Luas Lahan (m²)</label>
+        <input type="number" name="luasLahan" placeholder="Contoh: 1000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Daerah -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Daerah</label>
+        <input type="text" name="daerah" placeholder="Contoh: Cicalengka" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Harga Pupuk -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Harga Pupuk (1 karung)</label>
+        <input type="number" name="hargaPupuk" placeholder="Contoh: 50000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Harga Bibit -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Harga Bibit (per m²)</label>
+        <input type="number" name="hargaBibit" placeholder="Contoh: 1000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Modal Tanam -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Modal Tanam (Rp)</label>
+        <input type="number" name="modal" placeholder="Contoh: 1500000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Hasil Panen -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Hasil Panen (Rp)</label>
+        <input type="number" name="hasilPanen" placeholder="Contoh: 3000000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500" />
+      </div>
+
+      <!-- Tombol Simpan -->
+      <div class="md:col-span-2 flex justify-start mt-4">
+        <button type="submit" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200">
+          ✔ Simpan Rencana
         </button>
       </div>
     </form>
   </div>
 
-  <!-- SCRIPT -->
+  <!-- SweetAlert Handler -->
   <script>
-    function handlePerencanaan(event) {
-      event.preventDefault();
+    document.getElementById("formRencana").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-      const nama = document.getElementById('namaRencana').value.trim();
-      const jenis = document.getElementById('jenisKegiatan').value;
+      const form = e.target;
+      const formData = new FormData(form);
+      const emptyFields = [];
 
-      // Validasi seperti versi tambah lahan
-      if (!nama && !jenis) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Data Belum Lengkap',
-          text: 'Nama rencana dan jenis kegiatan wajib diisi.',
-          confirmButtonColor: '#d33'
-        });
-        return false;
-      }
-
-      if (!nama) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Nama Rencana Kosong',
-          text: 'Nama rencana wajib diisi.',
-          confirmButtonColor: '#d33'
-        });
-        return false;
-      }
-
-      if (!jenis) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Jenis Kegiatan Belum Dipilih',
-          text: 'Silakan pilih jenis kegiatan.',
-          confirmButtonColor: '#d33'
-        });
-        return false;
-      }
-
-      // Konfirmasi
-      Swal.fire({
-        title: 'Simpan Perencanaan?',
-        text: 'Apakah kamu yakin ingin menyimpan perencanaan ini?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#10b981',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Simpan'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Menyimpan...',
-            text: 'Mohon tunggu sebentar.',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            didOpen: () => Swal.showLoading()
-          });
-
-          setTimeout(() => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Berhasil!',
-              text: 'Perencanaan berhasil disimpan.',
-              confirmButtonColor: '#10b981'
-            });
-            document.getElementById('formPerencanaan').reset();
-          }, 2000);
+      form.querySelectorAll("[name]").forEach(input => {
+        if (!input.value.trim()) {
+          const label = input.closest("div").querySelector("label").innerText;
+          emptyFields.push(label);
         }
       });
 
-      return false;
-    }
-  </script>
+      if (emptyFields.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Form Belum Lengkap!",
+          html: "Harap isi data berikut:<br><b>" + emptyFields.join("</b><br><b>") + "</b>",
+        });
+        return;
+      }
 
+      Swal.fire({
+        title: "Simpan Data?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, simpan!",
+        cancelButtonText: "Batal",
+        preConfirm: () => {
+          Swal.showLoading();
+          return fetch("simpanPerencanaan.php", {
+            method: "POST",
+            body: formData
+          })
+          .then(res => {
+            if (!res.ok) throw new Error("Gagal menyimpan!");
+            return res.text();
+          })
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil!",
+              text: "Data perencanaan berhasil disimpan.",
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = "perencanaan.php";
+            });
+          })
+          .catch(err => {
+            Swal.fire("Gagal!", err.message, "error");
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
+  die("Akses ditolak. Anda belum login.");
+}
+
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -9,22 +16,26 @@ if ($conn->connect_error) {
   die("Koneksi gagal: " . $conn->connect_error);
 }
 
+$user_id = $_SESSION['user_id']; // Ambil ID user dari session
+
 // Proses simpan data jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $nama      = $_POST['namaLahan'];
-  $luas      = $_POST['luasLahan'];
-  $tempat    = $_POST['tempatLahan'];
-  $jenis     = $_POST['jenisPadi'];
-  $tanam     = $_POST['mulaiTanam'];
-  $deskripsi = $_POST['deskripsiLahan'];
-  $maps      = $_POST['linkMaps'];
-  $pestisida = $_POST['pestisida'];
-  $modal     = $_POST['modalTanam'];
+  $nama       = $_POST['namaLahan'];
+  $luas       = $_POST['luasLahan'];
+  $tempat     = $_POST['tempatLahan'];
+  $jenis      = $_POST['jenisPadi'];
+  $tanam      = $_POST['mulaiTanam'];
+  $deskripsi  = $_POST['deskripsiLahan'];
+  $maps       = $_POST['linkMaps'];
+  $pestisida  = $_POST['pestisida'];
+  $modal      = $_POST['modalTanam'];
+  $lat        = $_POST['koordinatLat'];
+  $lng        = $_POST['koordinatLng'];
 
-  // Upload file
-  $fotoName = $_FILES['fotoLahan']['name'];
-  $tmpPath  = $_FILES['fotoLahan']['tmp_name'];
-  $targetDir = "uploads/";
+  // Upload foto
+  $fotoName   = $_FILES['fotoLahan']['name'];
+  $tmpPath    = $_FILES['fotoLahan']['tmp_name'];
+  $targetDir  = "uploads/";
   if (!file_exists($targetDir)) {
     mkdir($targetDir, 0777, true);
   }
@@ -33,31 +44,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $targetPath = $targetDir . $newFileName;
 
   if (move_uploaded_file($tmpPath, $targetPath)) {
-    $stmt = $conn->prepare("INSERT INTO lahan (nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam, foto_lahan, deskripsi, link_maps, pestisida, modal_tanam) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sisssssssi", $nama, $luas, $tempat, $jenis, $tanam, $newFileName, $deskripsi, $maps, $pestisida, $modal);
+    // Simpan ke database
+    $stmt = $conn->prepare("INSERT INTO lahan 
+      (user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam, foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param("isisssssssdss", 
+      $user_id, $nama, $luas, $tempat, $jenis, $tanam, $newFileName, 
+      $deskripsi, $maps, $pestisida, $modal, $lat, $lng);
 
     if ($stmt->execute()) {
       header("Location: lahan.php?success=1");
       exit;
     } else {
-      header("Location: formLahan.php?error=db");
-      exit;
+      echo "Gagal menyimpan data: " . $stmt->error;
     }
   } else {
-    header("Location: formLahan.php?error=upload");
-    exit;
+    echo "Gagal mengunggah file gambar.";
   }
 }
 
-// Ambil data lahan dari database
-$result = $conn->query("SELECT * FROM lahan ORDER BY id DESC");
+// Ambil data lahan untuk ditampilkan
+$result = $conn->query("SELECT * FROM lahan WHERE user_id = $user_id ORDER BY id DESC");
 $lahanData = [];
 while ($row = $result->fetch_assoc()) {
   $lahanData[] = $row;
 }
 $conn->close();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="id">

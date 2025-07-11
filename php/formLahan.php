@@ -75,7 +75,7 @@
           <textarea id="deskripsiLahan" name="deskripsiLahan" rows="3" class="w-full rounded-xl border px-4 py-2 text-sm resize-none focus:ring-green-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- Maps -->
+        <!-- Link Maps -->
         <div class="md:col-span-2">
           <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
           <input type="url" id="linkMaps" name="linkMaps" placeholder="https://maps.google.com/..." class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
@@ -99,6 +99,10 @@
           <input type="number" id="modalTanam" name="modalTanam" class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
         </div>
       </div>
+
+      <!-- Hidden Fields for Coordinates -->
+      <input type="hidden" id="koordinatLat" name="koordinatLat">
+      <input type="hidden" id="koordinatLng" name="koordinatLng">
 
       <!-- Tombol -->
       <div class="pt-2 flex justify-between">
@@ -148,38 +152,39 @@
       }
     }
 
+    // Ambil koordinat otomatis dari link maps
+    document.getElementById('linkMaps').addEventListener('input', function () {
+      const link = this.value;
+      const latField = document.getElementById('koordinatLat');
+      const lngField = document.getElementById('koordinatLng');
+      const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (match) {
+        latField.value = match[1];
+        lngField.value = match[2];
+      } else {
+        latField.value = "";
+        lngField.value = "";
+      }
+    });
+
     function handleSubmit(event) {
       event.preventDefault();
-      const namaLahan = document.getElementById('namaLahan').value.trim();
-      const luasLahan = document.getElementById('luasLahan').value.trim();
-      const tempatLahan = document.getElementById('tempatLahan').value.trim();
-      const jenisPadi = document.getElementById('jenisPadi').value;
-      const mulaiTanam = document.getElementById('mulaiTanam').value;
-      const fotoLahan = document.getElementById('fotoLahan').files[0];
-      const modalTanam = document.getElementById('modalTanam').value;
-      const deskripsi = document.getElementById('deskripsiLahan').value.trim();
-      const linkMaps = document.getElementById('linkMaps').value.trim();
-      const pestisida = document.getElementById('pestisida').value;
-
+      const form = document.getElementById('formLahan');
+      const required = ['namaLahan', 'luasLahan', 'tempatLahan', 'jenisPadi', 'mulaiTanam', 'fotoLahan', 'deskripsiLahan', 'linkMaps', 'pestisida', 'modalTanam'];
       let pesan = "";
-      if (!namaLahan) pesan += "- Nama lahan\n";
-      if (!luasLahan) pesan += "- Luas lahan\n";
-      if (!tempatLahan) pesan += "- Tempat lahan\n";
-      if (!jenisPadi) pesan += "- Jenis padi\n";
-      if (!mulaiTanam) pesan += "- Tanggal tanam\n";
-      if (!fotoLahan) pesan += "- Foto lahan\n";
-      if (!deskripsi) pesan += "- Deskripsi\n";
-      if (!linkMaps) pesan += "- Link Maps\n";
-      if (!pestisida) pesan += "- Pestisida\n";
-      if (!modalTanam) pesan += "- Modal tanam\n";
+
+      required.forEach(id => {
+        const val = document.getElementById(id).value.trim();
+        if (!val) pesan += `- ${id}\n`;
+      });
 
       if (pesan !== "") {
         Swal.fire({ icon: 'error', title: 'Data Belum Lengkap', text: "Mohon isi:\n" + pesan, confirmButtonColor: '#d33' });
         return false;
       }
 
+      const inputDate = new Date(document.getElementById('mulaiTanam').value);
       const today = new Date(); today.setHours(0,0,0,0);
-      const inputDate = new Date(mulaiTanam);
       if (inputDate < today) {
         Swal.fire({ icon: 'error', title: 'Tanggal Tanam Tidak Valid', text: 'Minimal hari ini.', confirmButtonColor: '#d33' });
         return false;
@@ -202,7 +207,7 @@
             didOpen: () => Swal.showLoading()
           });
           setTimeout(() => {
-            document.getElementById('formLahan').submit(); // KIRIM KE `lahan.php`
+            form.submit();
           }, 800);
         }
       });
