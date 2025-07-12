@@ -443,8 +443,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="mt-1">Lahan</span>
             </a>
 
-            <!-- Search -->
-            <a href="search.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+            <!-- Edukasi -->
+            <a href="php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
                 <i class="fi fi-ss-book-open-cover text-lg"></i>
                 <span>Edukasi</span>
             </a>

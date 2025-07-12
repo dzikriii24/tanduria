@@ -1,3 +1,20 @@
+<?php
+// Ambil data Harga GKP dan Beras dari Flask server
+$flask_api_url = 'http://localhost:5000/api/bps-data';
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $flask_api_url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+
+$scrapedData = ($response !== false) ? json_decode($response, true) : null;
+
+$gkpData = $scrapedData['gkp'] ?? [];
+$berasData = $scrapedData['beras'] ?? [];
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -7,190 +24,151 @@
   <title>Harga GKP - Tanduria</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Memastikan canvas tidak "memaksa" ukuran parent */
+    canvas {
+      position: relative;
+      height: 400px; /* Memberi tinggi yang cukup untuk desktop */
+      width: 100%;
+    }
+  </style>
 </head>
 
-<body class="bg-white text-gray-800">
+<body class="bg-gray-50 text-gray-800 overflow-x-hidden">
 
-  <!-- Container -->
-  <div class="max-w-md mx-auto p-4">
-    <p class="text-lg font-semibold mb-2">Harga GKP per 3 bulan</p>
+<div class="w-full max-w-7xl mx-auto p-4 md:p-6">
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
     <!-- Chart Area -->
-    <div class="bg-white rounded-xl p-2 md: shadow">
-      <canvas id="hargaChart" class="w-full h-52"></canvas>
+    <div class="bg-white rounded-xl p-4 shadow-md flex flex-col lg:col-span-2">
+      <p class="text-lg font-semibold mb-2">Harga GKP (Gabah Kering Panen)</p>
+      <div class="relative flex-grow h-[300px]">
+        <canvas id="hargaChart"></canvas>
+      </div>
     </div>
 
-
-
-    <!-- Harga padi terkini -->
-    <div class="bg-white md: shadow text-sm text-center py-2 rounded-lg mt-2">
-      Harga padi saat ini: <span class="font-semibold text-green-700">Rp 5.600/kg</span> <br>
-      (per 5 Juli 2025) <br>
-      halah nyocot
+    <!-- Harga Padi Terkini -->
+    <div class="bg-white rounded-xl p-4 shadow-md flex flex-col justify-center items-center">
+      <p class="text-sm text-gray-600 mb-1">Harga Padi GKP (Referensi)</p>
+      <p class="text-xl font-bold text-green-700">Rp 5.600/kg</p>
+      <p class="text-xs text-gray-500">(Data per 05 Juli 2025)</p>
     </div>
 
-    <!-- Tombol Kembali Ke Dashboard Jang-->
-    <div class="mt-4">
-      <button class="w-500px h-100px bg-white font-semibold shadow py-2 rounded-lg hover:bg-gray-100 transition duration-200">
-        Jangankan ewe
-      </button>
+    <!-- Harga Beras Nasional -->
+    <div class="bg-white rounded-xl p-4 shadow-md lg:col-span-3">
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Harga Beras Nasional</h2>
+      <p class="text-sm text-gray-500 mb-4">Update: <?php echo date('d F Y'); ?></p>
+      <div class="overflow-x-auto">
+        <?php
+        if (!$berasData || empty($berasData)) {
+            echo "<p class='text-red-600 text-center mt-4'>Gagal mengambil data dari API atau data tidak tersedia.</p>";
+        } else {
+            echo "<table class='table-auto w-full text-sm'>";
+            echo "<thead class='bg-gray-100 sticky top-0'>";
+            echo "<tr>
+                    <th class='px-4 py-2 text-left font-semibold text-gray-600'>Kategori</th>
+                    <th class='px-4 py-2 text-left font-semibold text-gray-600'>Harga (Rp/kg)</th>
+                  </tr>";
+            echo "</thead>";
+            echo "<tbody class='bg-white divide-y divide-gray-200'>";
+            foreach ($berasData as $item) {
+                $kategori = htmlspecialchars($item['kategori']);
+                $harga = isset($item['harga']) ? 'Rp ' . number_format($item['harga'], 0, ',', '.') : 'Tidak tersedia';
+                echo "<tr class='hover:bg-gray-50'>";
+                echo "<td class='px-4 py-3 whitespace-nowrap'>$kategori</td>";
+                echo "<td class='px-4 py-3 whitespace-nowrap font-medium'>$harga</td>";
+                echo "</tr>";
+            }
+            echo "</tbody>";
+            echo "</table>";
+        }
+        ?>
+      </div>
     </div>
 
   </div>
 
-  <?php
-  // Ambil tanggal hari ini
-  function getHargaBerasHariIni()
-  {
-    $tanggal = date('d/m/Y');
-    $period = urlencode("$tanggal - $tanggal");
+  <div class="mt-6">
+    <a href="../index.php"><button class="w-full bg-green-600 text-white font-semibold shadow-md py-2.5 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">Kembali ke Dashboard</button></a>
+  </div>
 
-    $url = "https://api-panelhargav2.badanpangan.go.id/api/front/harga-peta-provinsi?level_harga_id=1&komoditas_id=2&period_date=$period&multi_status_map[0]=&multi_province_id[0]=";
+</div>
 
-    $curl = curl_init();
 
-    curl_setopt_array($curl, array(
-      CURLOPT_URL => $url,
-      CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_FOLLOWLOCATION => true,
-      CURLOPT_HTTPHEADER => array(
-        'User-Agent: Mozilla/5.0',
-        'Accept: application/json'
-      )
-    ));
+<?php
+$labels = [];
+$data = [];
 
-    $response = curl_exec($curl);
-    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    curl_close($curl);
-
-    if ($httpcode !== 200 || !$response) {
-      return null;
+if ($gkpData) {
+    foreach ($gkpData as $item) {
+        $labels[] = $item['Bulan'];
+        $data[] = (float) $item['harga'];
     }
+}
+?>
 
-    return json_decode($response, true);
-  }
-
-
-  // Cek jika API tidak bisa diakses
-  $data = getHargaBerasHariIni();
-
-  if (!$data || !isset($data['data'])) {
-    echo "<p class='text-red-600'>Gagal mengambil data dari API.</p>";
-    exit;
-  }
-
-
-  echo "<div class='w-full max-w-4xl'>";
-  echo "<h1 class='text-2xl font-bold text-green-800 mb-4'>Harga Beras Nasional Hari Ini ($tanggal)</h1>";
-  echo "<table class='table-auto w-full bg-white shadow-md rounded-lg overflow-hidden'>";
-  echo "<thead class='bg-green-600 text-white'>";
-  echo "<tr>
-        <th class='px-4 py-2 text-left'>Provinsi</th>
-        <th class='px-4 py-2 text-left'>Harga (Rp/kg)</th>
-      </tr>";
-  echo "</thead>";
-  echo "<tbody>";
-
-  foreach ($data['data'] as $item) {
-    $provinsi = $item['province_name'];
-    $harga = isset($item['harga']) ? number_format($item['harga'], 0, ',', '.') : 'Tidak tersedia';
-
-    echo "<tr class='border-b hover:bg-green-100'>";
-    echo "<td class='px-4 py-2'>$provinsi</td>";
-    echo "<td class='px-4 py-2'>Rp $harga</td>";
-    echo "</tr>";
-  }
-
-
-  echo "</tbody>";
-  echo "</table>";
-  echo "</div>";
-  ?>
-
-  <!-- Chart Script -->
-  <script>
-    const ctx = document.getElementById('hargaChart').getContext('2d');
-    const hargaChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [
-          'Jun 2023', 'Sep 2023', 'Des 2023',
-          'Mar 2024', 'Jun 2024', 'Sep 2024',
-          'Des 2024', 'Mar 2025', 'Jun 2025',
-          'Sep 2025', 'Des 2025', 'Mar 2026', 'Jun 2026'
-        ],
-        datasets: [{
-          label: 'Harga GKP per 3 Bulan',
-          data: [2000, 4000, 3500, 6000, 7500, 5000, 8500, 10000, 12000, 11500, 14000, 13500, 14500],
-          borderColor: 'red',
-          backgroundColor: 'rgba(255, 0, 0, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.3,
-          pointRadius: 3,
-          pointHoverRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              color: '#333',
-              font: {
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
-              }
+<script>
+  const ctx = document.getElementById('hargaChart').getContext('2d');
+  const hargaChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: <?php echo json_encode($labels); ?>,
+      datasets: [{
+        label: 'Harga GKP Setiap Tiga Bulan',
+        data: <?php echo json_encode($data); ?>,
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#ef4444',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: { color: '#333', font: { size: 12 }, boxWidth: 20, padding: 20 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'Harga: Rp ' + context.parsed.y.toLocaleString('id-ID');
             }
           }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#666', maxRotation: 45, minRotation: 0 }
         },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Waktu (per 3 bulan)',
-              color: '#333',
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
-            },
-            ticks: {
-              color: '#333'
-            }
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Harga GKP (Rp)',
+            color: '#333',
+            font: { size: 12, weight: 'bold' }
           },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Harga GKP (Rp)',
-              color: '#333',
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
-            },
-            ticks: {
-              color: '#333',
-              callback: function(value) {
-                return 'Rp ' + (value).toLocaleString('id-ID');
-              }
+          ticks: {
+            color: '#666',
+            callback: function(value) {
+              return 'Rp ' + (value / 1000) + 'k';
             }
           }
         }
       }
-    });
-  </script>
+    }
+  });
+</script>
 
-  <script src="../javascript/chart.js"></script>
 
 </body>
-
 </html>
