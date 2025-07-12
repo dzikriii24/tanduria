@@ -21,6 +21,11 @@ $suhu = round($cuacaNow['main']['temp']);
 $cuaca = ucfirst($cuacaNow['weather'][0]['description']);
 $icon = $cuacaNow['weather'][0]['icon'];
 
+$iconPath = "asset/weather/{$icon}.png";
+if (!file_exists($iconPath)) {
+    $iconPath = "asset/weather/01d.png";
+}
+
 // Ambil 4 waktu berbeda dari forecast
 $prediksi = [];
 for ($i = 0; $i < 4; $i++) {
@@ -28,7 +33,7 @@ for ($i = 0; $i < 4; $i++) {
     $prediksi[] = [
         'cuaca' => ucfirst($data['weather'][0]['description']),
         'suhu' => round($data['main']['temp']),
-        'icon' => $data['weather'][0]['icon']
+        'icon' => "asset/weather/" . $data['weather'][0]['icon'] . ".png"
     ];
 }
 
@@ -142,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Panel Cuaca -->
-        <div class="hovers bg-[#1D6034] rounded-xl shadow p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">
+        <div class="hovers bg-[#1D6034] rounded-xl shadow p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">    
             <div class="flex justify-center items-center flex-col">
                 <h2 class="text-lg sm:text-xl  font-medium">Cuaca Hari Ini</h2>
                 <p class="text-lg sm:text-xl font-semibold "><?= $cuaca ?></p>
@@ -150,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
             <div class="flex justify-center items-center flex-col bg-[#2C8F53] w-full rounded-xl">
-                <img src="https://openweathermap.org/img/wn/<?= $icon ?>@2x.png" class="w-26 h-26 mb-2">
+                <img src="asset/weather/<?= $icon ?>.png" class="w-26 h-26 mb-2">
             </div>
 
         </div>
@@ -178,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ?>
                     <div class="flex-shrink-0 bg-[#2C8F53] rounded-xl shadow p-4 w-32 sm:w-40 text-center hover-gelap">
                         <p class="text-sm font-medium mb-1 truncate"><?= $hari ?></p>
-                        <img src="https://openweathermap.org/img/wn/<?= $p['icon'] ?>@2x.png" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
+                        <img src="<?= $p['icon'] ?>" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
                         <p class="text-xs sm:text-sm font-semibold leading-tight line-clamp-2"><?= $p['cuaca'] ?></p>
                         <p class="text-sm"><?= $p['suhu'] ?>°C</p>
                     </div>
@@ -303,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 mb-30 bg-[#2C8F53] p-6 rounded-xl">
 
             <div class="grid grid-cols-2 gap-4 sm:gap-8  mx-auto">
-                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                <a href="php/lahan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
                             <img
@@ -317,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 </a>
-                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                <a href="php/hargaGkpPadi.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
                             <img
@@ -326,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 class="rounded-xl" />
                         </figure>
                         <div class="card-body items-center text-center">
-                            <h2 class="card-title">Prediksi Harga</h2>
+                            <h2 class="card-title">Harga Padi</h2>
                             <p>title and actions parts</p>
                         </div>
                     </div>
@@ -345,7 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 </a>
-                <a href="" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                <a href="php/formPerencanaan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
                             <img
@@ -391,7 +396,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Form Konsultasi Manual -->
                     <div class="bg-white rounded-xl shadow p-4">
                         <h3 class="text-lg font-semibold text-[#1D6034] mb-2">📤 Konsultasi Manual</h3>
-                        <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">    
                             <fieldset class="fieldset">
                                 <legend class="fieldset-legend">Deskripsikan Gejalanya</legend>
                                 <textarea class="textarea h-24" placeholder="Daun menguning sejak 3 hari ..." required name="gejala"></textarea>
@@ -453,7 +458,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>
-            
+
         </div>
     </div>
 
@@ -480,7 +485,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-<script src="javascript/chart.js"></script>
+    <script src="javascript/chart.js"></script>
     <script src="javascript/index.js"></script>
 </body>
 

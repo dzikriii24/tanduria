@@ -1,11 +1,4 @@
 <?php
-session_start();
-
-// Cek apakah user sudah login
-if (!isset($_SESSION['user_id'])) {
-  die("Akses ditolak. Anda belum login.");
-}
-
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -16,26 +9,24 @@ if ($conn->connect_error) {
   die("Koneksi gagal: " . $conn->connect_error);
 }
 
-$user_id = $_SESSION['user_id']; // Ambil ID user dari session
+session_start();
 
 // Proses simpan data jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $nama       = $_POST['namaLahan'];
-  $luas       = $_POST['luasLahan'];
-  $tempat     = $_POST['tempatLahan'];
-  $jenis      = $_POST['jenisPadi'];
-  $tanam      = $_POST['mulaiTanam'];
-  $deskripsi  = $_POST['deskripsiLahan'];
-  $maps       = $_POST['linkMaps'];
-  $pestisida  = $_POST['pestisida'];
-  $modal      = $_POST['modalTanam'];
-  $lat        = $_POST['koordinatLat'];
-  $lng        = $_POST['koordinatLng'];
+  $nama      = $_POST['namaLahan'];
+  $luas      = $_POST['luasLahan'];
+  $tempat    = $_POST['tempatLahan'];
+  $jenis     = $_POST['jenisPadi'];
+  $tanam     = $_POST['mulaiTanam'];
+  $deskripsi = $_POST['deskripsiLahan'];
+  $maps      = $_POST['linkMaps'];
+  $pestisida = $_POST['pestisida'];
+  $modal     = $_POST['modalTanam'];
 
-  // Upload foto
-  $fotoName   = $_FILES['fotoLahan']['name'];
-  $tmpPath    = $_FILES['fotoLahan']['tmp_name'];
-  $targetDir  = "uploads/";
+  // Upload file
+  $fotoName = $_FILES['fotoLahan']['name'];
+  $tmpPath  = $_FILES['fotoLahan']['tmp_name'];
+  $targetDir = "uploads/";
   if (!file_exists($targetDir)) {
     mkdir($targetDir, 0777, true);
   }
@@ -44,28 +35,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $targetPath = $targetDir . $newFileName;
 
   if (move_uploaded_file($tmpPath, $targetPath)) {
-    // Simpan ke database
-    $stmt = $conn->prepare("INSERT INTO lahan 
-      (user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam, foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    $stmt->bind_param("isisssssssdss", 
-      $user_id, $nama, $luas, $tempat, $jenis, $tanam, $newFileName, 
-      $deskripsi, $maps, $pestisida, $modal, $lat, $lng);
+    $stmt = $conn->prepare("INSERT INTO lahan (nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam, foto_lahan, deskripsi, link_maps, pestisida, modal_tanam)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sisssssssi", $nama, $luas, $tempat, $jenis, $tanam, $newFileName, $deskripsi, $maps, $pestisida, $modal);
 
     if ($stmt->execute()) {
       header("Location: lahan.php?success=1");
       exit;
     } else {
-      echo "Gagal menyimpan data: " . $stmt->error;
+      header("Location: formLahan.php?error=db");
+      exit;
     }
   } else {
-    echo "Gagal mengunggah file gambar.";
+    header("Location: formLahan.php?error=upload");
+    exit;
   }
 }
 
-// Ambil data lahan untuk ditampilkan
-$result = $conn->query("SELECT * FROM lahan WHERE user_id = $user_id ORDER BY id DESC");
+
+$user_id = $_SESSION['user_id'];
+
+
+$stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? ORDER BY id DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+// Ambil data lahan dari database
 $lahanData = [];
 while ($row = $result->fetch_assoc()) {
   $lahanData[] = $row;
@@ -73,10 +68,8 @@ while ($row = $result->fetch_assoc()) {
 $conn->close();
 ?>
 
-
-
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="bg-[#F5F2EB] overflow-x-hidden">
 
 <head>
   <meta charset="UTF-8">
@@ -100,7 +93,7 @@ $conn->close();
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col font-sans">
+<body class="poppins-reguler">
 
   <?php if (isset($_GET['success'])): ?>
     <script>
@@ -117,15 +110,31 @@ $conn->close();
       }
     </script>
   <?php endif; ?>
-  <div class="navbar bg-base-100 shadow-sm">
+  <div class="navbar text-white bg-[#1D6034] shadow-sm">
     <div class="flex-1">
       <p class="poppins-semibold text-xl">Daftar Lahan</p>
     </div>
     <div class="flex gap-2">
-      <input type="text" placeholder="Cari Lahan" class="input input-bordered w-24 md:w-auto" />
+      <label class="mt-1 poppins-regular bg-[#FFFFFF] aret-[#1F2937] text-[#1F2937] input items-center -mt-5 flex justify-self-center outline-none rounded-xl hover:outline-hidden focus:outline-hidden lg:w-[500px]" style="outline:none;">
+        <input type="search" name="q" required placeholder="Cari Lahan" class="poppins-reguler caret-[#1F2937] text-[#1F2937] bg-[#1F2937 ] outline-none lg:p-4 rounded-lg" style="outline:none;" id="searchInput" onkeyup="searchLahan()" />
+        <button class="hover:text-[#7C3AED] transition-colors duration-300 cursor-pointer" type="submit">
+          <svg class="h-[1em] opacity-70" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+        </button>
+
+      </label>
       <a href="#" id="tambahLahanBtn"
         onclick="handleTambahLahanClick(event)"
-        class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#B03C3C] hover:to-[#B03C3C] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
         <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
         <svg id="spinnerIcon" class="hidden w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -149,138 +158,78 @@ $conn->close();
         </div>
 
         <!-- Map -->
-        <div id="map" class="h-[500px] w-full rounded-xl"></div>
+        <div id="map" class="h-[500px] w-full rounded-lg border-8 border-[#B03C3C] rounded-lg" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;"></div>
       </div>
 
       <!-- DETAIL (1 kolom) -->
       <div class="w-full">
-        <div id="info-panel" class="bg-white shadow-md rounded-xl p-4">
-          <h2 class="poppins-bold text-2xl text-[#1F2937] md:text-3xl mb-2">
+        <div id="info-panel" class="bg-[#1D6034] text-white shadow-md rounded-lg p-4 hovers">
+          <h2 class="poppins-bold text-2xl text-[#ffff] md:text-3xl mb-2">
             Detail Tempat
           </h2>
-          <div id="info" class="text-[#4B5563]">
+          <div id="info" class="text-[#4B5563] bg-white">
             <!-- Detail lokasi akan muncul di sini -->
           </div>
         </div>
+
       </div>
     </div>
   </div>
 
-  <div class="mt-10 mx-auto px-4 w-full gap-6 grid sm:grid-cols-2 grid-cols-1">
+  <div class="mx-auto px-4 w-full gap-6 grid sm:grid-cols-4 grid-cols-1 pt-10 pb-30 bg-white" id="lahan">
     <?php if (count($lahanData) > 0): ?>
       <?php foreach ($lahanData as $lahan): ?>
-        <div class="bg-white shadow-md rounded-2xl p-6 border border-gray-200">
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div class="flex-1">
-              <h2 class="text-xl font-semibold text-gray-800 mb-1"><?= htmlspecialchars($lahan['nama_lahan']) ?></h2>
-              <p class="text-sm text-gray-600">Jenis padi: <?= htmlspecialchars($lahan['jenis_padi']) ?></p>
-              <p class="text-sm text-gray-600">Mulai tanam: <?= htmlspecialchars(date("d/m/Y", strtotime($lahan['mulai_tanam']))) ?></p>
-            </div>
-            <div class="flex justify-end w-full md:w-auto">
-              <a href="detailLahan.php?id=<?= $lahan['id'] ?>"
-                class="inline-flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-800 font-medium transition duration-200 group">
-                Lihat detail lahan
-                <svg class="w-4 h-4 transform transition-transform duration-200 group-hover:translate-x-1" fill="none"
-                  stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
+        <a href="detailLahan.php?id=<?= $lahan['id'] ?>" class="block rounded-lg p-4 shadow-xs shadow-indigo-100 bg-[#2C8F53] hovers">
+          <img
+            alt=""
+            src="<?= htmlspecialchars($lahan['foto_lahan']) ?>"
+            class="h-56 w-full rounded-md object-cover" />
+
+          <div class="mt-2">
+            <dl>
+              <div>
+                <dt class="sr-only">Lokasi Lahan</dt>
+
+                <dd class="text-sm text-white nama_lahan"><?= htmlspecialchars($lahan['tempat_lahan']) ?></dd>
+              </div>
+
+              <div >
+                <dt class="sr-only">Nama Lahan</dt>
+
+                <dd class="font-semibold text-lg nama_lahan text-white"><?= htmlspecialchars($lahan['nama_lahan']) ?></dd>
+              </div>
+            </dl>
+
+            <dl class="mt-6 flex gap-4 lg:gap-6">
+              <div class="flex items-center gap-2">
+                <dt class="text-white">
+                  <span class="sr-only"> Tanggal Tanam </span>
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                  </svg>
+                </dt>
+
+                <dd class="text-xs text-white"><?= htmlspecialchars(date("d/m/Y", strtotime($lahan['mulai_tanam']))) ?></dd>
+              </div>
+            </dl>
           </div>
-        </div>
+        </a>
       <?php endforeach; ?>
     <?php else: ?>
       <div class="text-gray-600 text-sm">Belum ada data lahan.</div>
     <?php endif; ?>
 
-    <a href="#" class="block rounded-lg p-4 shadow-xs shadow-indigo-100">
-      <img
-        alt=""
-        src="https://images.unsplash.com/photo-1613545325278-f24b0cae1224?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-        class="h-56 w-full rounded-md object-cover" />
 
-      <div class="mt-2">
-        <dl>
-          <div>
-            <dt class="sr-only">Price</dt>
-
-            <dd class="text-sm text-gray-500">$240,000</dd>
-          </div>
-
-          <div>
-            <dt class="sr-only">Address</dt>
-
-            <dd class="font-medium">123 Wallaby Avenue, Park Road</dd>
-          </div>
-        </dl>
-
-        <div class="mt-6 flex items-center gap-8 text-xs">
-          <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
-            <svg
-              class="size-4 text-indigo-700"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-            </svg>
-
-            <div class="mt-1.5 sm:mt-0">
-              <p class="text-gray-500">Parking</p>
-
-              <p class="font-medium">2 spaces</p>
-            </div>
-          </div>
-
-          <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
-            <svg
-              class="size-4 text-indigo-700"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-
-            <div class="mt-1.5 sm:mt-0">
-              <p class="text-gray-500">Bathroom</p>
-
-              <p class="font-medium">2 rooms</p>
-            </div>
-          </div>
-
-          <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
-            <svg
-              class="size-4 text-indigo-700"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-
-            <div class="mt-1.5 sm:mt-0">
-              <p class="text-gray-500">Bedroom</p>
-
-              <p class="font-medium">4 rooms</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a>
   </div>
 
   <!-- Bottom Navigation Dock -->
@@ -319,6 +268,7 @@ $conn->close();
     </div>
   </div>
   <script src="../javascript/lahan.js"></script>
+  <script src="../javascript/other.js"></script>
   <script>
     function handleTambahLahanClick(event) {
       event.preventDefault();
@@ -342,3 +292,4 @@ $conn->close();
   </script>
 
 </body>
+</html>
