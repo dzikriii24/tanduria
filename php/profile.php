@@ -71,11 +71,31 @@ $user = mysqli_fetch_assoc($query);
         Nama Lengkap: <?= htmlspecialchars($user['nama']) ?>
       </button> -->
 
+<<<<<<< HEAD
         <!-- No Telepon -->
         <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
           Nomor Telepon: <?= htmlspecialchars($user['no_telepon']) ?>
+=======
+      <!-- No Telepon -->
+      <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
+         <?= htmlspecialchars($user['no_telepon']) ?>
+      </button>
+
+      <!-- Jenis Kelamin -->
+      <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
+         <?= htmlspecialchars($user['jenis_kelamin']) ?>
+      </button>
+    </div>
+
+    <!-- Tombol Update Profil -->
+    <div class="mt-10">
+      <a href="update_profile.php">
+        <button class="w-full bg-[#009158] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-bg-[#006138] transition">
+          Update Profil
+>>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
         </button>
 
+<<<<<<< HEAD
         <!-- Jenis Kelamin -->
         <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
           Jenis Kelamin: <?= htmlspecialchars($user['jenis_kelamin']) ?>
@@ -128,8 +148,101 @@ $user = mysqli_fetch_assoc($query);
         </div>
       </div>
     </div>
+=======
+   <div class="mt-2">
+  <button onclick="confirmLogout()" 
+          class="w-full bg-[#C23132] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-red-600 transition">
+    Logout
+  </button>
+</div>
+
+
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
+        <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
+            <!-- Home -->
+            <a href="index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all active-nav">
+                <i class="fi fi-sr-home text-lg text-[#1D6034]"></i>
+                <span class="text-[#1D6034]">Dashboard</span>
+            </a>
+
+            <!-- Bookmark -->
+            <a href="php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-ss-bell text-lg"></i>
+                <span>Notifikasi</span>
+            </a>
+
+            <!-- Post -->
+            <a href="php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
+                    <i class="fi fi-sr-land-layers text-xl"></i>
+                </div>
+                <span class="mt-1">Lahan</span>
+            </a>
+
+            <!-- Edukasi -->
+            <a href="php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-ss-book-open-cover text-lg"></i>
+                <span>Edukasi</span>
+            </a>
+            <!-- Settings -->
+            <a href="php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-sr-user text-lg"></i>
+                <span>Profil</span>
+            </a>
+
+        </div>
+    </div>
+
+  </div>
+
+  <!-- SweetAlert Logout -->
+  <script>
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Keluar dari akun?',
+        text: "Anda akan keluar dari halaman.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Logout',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = 'logout.php';
+        }
+      });
+    }
+  </script>
+
+  <!-- SweetAlert Login Berhasil -->
+  <?php if (isset($_SESSION['login_success'])): ?>
+    <script>
+      Swal.fire({
+        title: 'Berhasil Login!',
+        text: 'Selamat datang kembali!',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    </script>
+    <?php unset($_SESSION['login_success']); ?>
+  <?php endif; ?>
+>>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
 
     <script src="../javascript/other.js"></script>
 </body>
+<<<<<<< HEAD
 
 </html>
+=======
+<script>
+  function confirmLogout() {
+    if (confirm("Apakah kamu yakin ingin logout?")) {
+      window.location.href = "logout.php";
+    }
+  }
+</script>
+
+</html>
+>>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
