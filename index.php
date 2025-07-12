@@ -1,60 +1,65 @@
 <?php
-require_once 'php/function/weatherAPI.php';
-require_once 'php/function/forecast.php';
-require_once 'php/function/helper.php';
 session_start();
-
+require_once 'php/db.php';
 $apikey = '2de2de72b98b6a2f84c0b9a4042c43fe';
-$kota = 'Bandung';
 
-$weather = getCurrentWeather($kota, $apikey);
-$forecast = getForecast($kota, $apikey);
+$user_id = $_SESSION['user_id'] ?? null;
+$lat = null;
+$lon = null;
 
-$cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?q=$kota&appid=$apikey&units=metric&lang=id";
-$forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=$kota&appid=$apikey&units=metric&lang=id";
+if ($user_id) {
+    $stmt = $conn->prepare("SELECT lokasi FROM user WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    if (!empty($row['lokasi'])) {
+        list($lat, $lon) = array_map('trim', explode(',', $row['lokasi']));
+    }
+}
+
+if ($lat && $lon) {
+    $cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid={$apikey}&units=metric&lang=id";
+    $forecastURL = "https://api.openweathermap.org/data/2.5/forecast?lat={$lat}&lon={$lon}&appid={$apikey}&units=metric&lang=id";
+} else {
+    $kota = 'Bandung';
+    $cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?q={$kota}&appid={$apikey}&units=metric&lang=id";
+    $forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q={$kota}&appid={$apikey}&units=metric&lang=id";
+}
 
 $cuacaNow = json_decode(file_get_contents($cuacaSekarangURL), true);
 $forecast = json_decode(file_get_contents($forecastURL), true);
 
-// Ambil suhu, deskripsi, icon
-$suhu = round($cuacaNow['main']['temp']);
-$cuaca = ucfirst($cuacaNow['weather'][0]['description']);
-$icon = $cuacaNow['weather'][0]['icon'];
+$suhu = isset($cuacaNow['main']['temp']) ? round($cuacaNow['main']['temp']) : 0;
+$cuaca = isset($cuacaNow['weather'][0]['description']) ? ucfirst($cuacaNow['weather'][0]['description']) : 'Tidak tersedia';
+$icon = isset($cuacaNow['weather'][0]['icon']) ? $cuacaNow['weather'][0]['icon'] : '01d';
+$iconPath = file_exists("asset/weather/{$icon}.png") ? "asset/weather/{$icon}.png" : "asset/weather/01d.png";
 
-$iconPath = "asset/weather/{$icon}.png";
-if (!file_exists($iconPath)) {
-    $iconPath = "asset/weather/01d.png";
-}
-
-// Ambil 4 waktu berbeda dari forecast
 $prediksi = [];
-for ($i = 0; $i < 4; $i++) {
-    $data = $forecast['list'][$i * 2]; // ambil data per 6 jam
-    $prediksi[] = [
-        'cuaca' => ucfirst($data['weather'][0]['description']),
-        'suhu' => round($data['main']['temp']),
-        'icon' => "asset/weather/" . $data['weather'][0]['icon'] . ".png"
-    ];
+if (!empty($forecast['list'])) {
+    $interval = floor(count($forecast['list']) / 4);
+    for ($i = 0; $i < 4; $i++) {
+        $data = $forecast['list'][$i * $interval];
+        $prediksi[] = [
+            'cuaca' => ucfirst($data['weather'][0]['description']),
+            'suhu' => round($data['main']['temp']),
+            'icon' => "asset/weather/" . ($data['weather'][0]['icon'] ?? '01d') . ".png"
+        ];
+    }
 }
-
-// Format tanggal
-$hari = date("l");
-$tanggal = date("j");
-$bulan = date("FY");
-
 
 $avg_temp = 0;
 $rainy_day = 0;
-
-for ($i = 0; $i < 8; $i++) {
+$forecast_count = min(8, count($forecast['list']));
+for ($i = 0; $i < $forecast_count; $i++) {
     $avg_temp += $forecast['list'][$i]['main']['temp'];
-    $desc = $forecast['list'][$i]['weather'][0]['main'];
-    if (strtolower($desc) == "rain") $rainy_day++;
+    if (strtolower($forecast['list'][$i]['weather'][0]['main']) === 'rain') {
+        $rainy_day++;
+    }
 }
-$avg_temp = round($avg_temp / 8);
-$rekomendasi = "";
+$avg_temp = $forecast_count > 0 ? round($avg_temp / $forecast_count) : 0;
 
-// Logika Tanam Berdasarkan Temperatur & Hujan
 if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
     $rekomendasi = "🌱 Kondisi cocok untuk menanam padi!";
 } elseif ($rainy_day > 4) {
@@ -63,28 +68,22 @@ if ($avg_temp >= 25 && $avg_temp <= 34 && $rainy_day <= 2) {
     $rekomendasi = "ℹ️ Kondisi belum ideal, perhatikan cuaca harian.";
 }
 
-$conn = new mysqli("localhost", "root", "", "tanduria");
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_SESSION['user_id']; // ⬅️ Ambil dari session
+    $user_id = $_SESSION['user_id'];
     $gejala = $_POST['gejala'] ?? '';
     $fotoName = '';
 
-    // Upload
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/';
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
         $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
         $fotoName = uniqid('foto_', true) . '.' . $ext;
         move_uploaded_file($_FILES['foto']['tmp_name'], $uploadDir . $fotoName);
     }
 
-    // Simpan
     $stmt = $conn->prepare("INSERT INTO konsultasi (user_id, gejala, foto) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $user_id, $gejala, $fotoName);
     $stmt->execute();
-
     header("Location: index.php?success=1");
     exit;
 }

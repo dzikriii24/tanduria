@@ -57,7 +57,7 @@ function fetchAllLahan() {
 
                 marker.on('click', () => {
                     document.getElementById('info-panel').innerHTML = `
-
+                    
                                         <button onclick="foto.showModal()" style="cursor: pointer;">
                                 <img
                                     src="${lahan.foto_lahan}"
@@ -76,7 +76,7 @@ function fetchAllLahan() {
                                 </div>
                             </dialog>
 
-                            <div class="hovers mt-2 rounded-lg p-4 poppins-regular bg-[#2C8F53]" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">    
+                            <div class="hovers mt-2 rounded-lg p-4 poppins-regular bg-[#2C8F53]" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
                                 <dl>
                                     <div>
                                         <dd class="font-medium">${lahan.nama_lahan}</dd>
@@ -111,7 +111,7 @@ function fetchAllLahan() {
                                             Detail Lahan
                                         </a></p>
         </div>
-
+                     
                                 </div>
                             </div>
                     `;
