@@ -61,67 +61,68 @@ $user = mysqli_fetch_assoc($query);
 
       <!-- No Telepon -->
       <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-        Nomor Telepon: <?= htmlspecialchars($user['no_telepon']) ?>
+         <?= htmlspecialchars($user['no_telepon']) ?>
       </button>
 
       <!-- Jenis Kelamin -->
       <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-        Jenis Kelamin: <?= htmlspecialchars($user['jenis_kelamin']) ?>
+         <?= htmlspecialchars($user['jenis_kelamin']) ?>
       </button>
     </div>
 
     <!-- Tombol Update Profil -->
     <div class="mt-10">
       <a href="update_profile.php">
-        <button class="w-full bg-[#2129B3] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-blue-900 transition">
+        <button class="w-full bg-[#009158] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-bg-[#006138] transition">
           Update Profil
         </button>
       </a>
     </div>
 
-    <div class="mt-2">
-      <button onclick="confirmLogout()" class="w-full bg-red-500 text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-red-600 transition">
-        Logout
-      </button>
+   <div class="mt-2">
+  <button onclick="confirmLogout()" 
+          class="w-full bg-[#C23132] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-red-600 transition">
+    Logout
+  </button>
+</div>
+
+
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
+        <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
+            <!-- Home -->
+            <a href="index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all active-nav">
+                <i class="fi fi-sr-home text-lg text-[#1D6034]"></i>
+                <span class="text-[#1D6034]">Dashboard</span>
+            </a>
+
+            <!-- Bookmark -->
+            <a href="php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-ss-bell text-lg"></i>
+                <span>Notifikasi</span>
+            </a>
+
+            <!-- Post -->
+            <a href="php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
+                    <i class="fi fi-sr-land-layers text-xl"></i>
+                </div>
+                <span class="mt-1">Lahan</span>
+            </a>
+
+            <!-- Edukasi -->
+            <a href="php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-ss-book-open-cover text-lg"></i>
+                <span>Edukasi</span>
+            </a>
+            <!-- Settings -->
+            <a href="php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+                <i class="fi fi-sr-user text-lg"></i>
+                <span>Profil</span>
+            </a>
+
+        </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-gray-200">
-      <div class="grid grid-cols-5 text-center text-xs text-gray-500">
-        <!-- Home -->
-        <a href="../index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all active-nav">
-          <i class="fi fi-sr-home text-lg text-blue-600"></i>
-          <span class="text-blue-600">Dashboard</span>
-        </a>
-
-        <!-- Notifikasi -->
-        <a href="notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-          <i class="fi fi-ss-bell text-lg"></i>
-          <span>Notifikasi</span>
-        </a>
-
-        <!-- Lahan -->
-        <a href="lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-          <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
-            <i class="fi fi-sr-land-layers text-xl"></i>
-          </div>
-          <span class="mt-1">Lahan</span>
-        </a>
-
-
-        <!-- Edukasi -->
-        <a href="edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-          <i class="fi fi-ss-book-open-cover text-lg"></i>
-          <span>Edukasi</span>
-        </a>
-
-        <!-- Profil -->
-        <a href="profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-blue-600 transition-all">
-          <i class="fi fi-sr-user text-lg"></i>
-          <span>Profil</span>
-        </a>
-      </div>
-    </div>
   </div>
 
   <!-- SweetAlert Logout -->
@@ -159,4 +160,12 @@ $user = mysqli_fetch_assoc($query);
   <?php endif; ?>
 
 </body>
+<script>
+  function confirmLogout() {
+    if (confirm("Apakah kamu yakin ingin logout?")) {
+      window.location.href = "logout.php";
+    }
+  }
+</script>
+
 </html>
