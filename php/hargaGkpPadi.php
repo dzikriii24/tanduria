@@ -36,6 +36,10 @@ $berasData = $scrapedData['beras'] ?? [];
 
 <body class="bg-gray-50 text-gray-800 overflow-x-hidden">
 
+<div>
+  <iframe src="http://localhost:8501/" frameborder="0" class="w-full h-[500px]"></iframe>
+</div>
+
 <div class="w-full max-w-7xl mx-auto p-4 md:p-6">
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

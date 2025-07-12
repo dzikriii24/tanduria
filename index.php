@@ -7,15 +7,38 @@ $user_id = $_SESSION['user_id'] ?? null;
 $lat = null;
 $lon = null;
 
+
+
+$iconMapping = [
+    '01d' => '01d.png',
+    '01n' => '01n.png',
+    '02d' => '02d.png',
+    '02n' => '02n.png',
+    '03d' => '03d.png',
+    '03n' => '03n.png',
+    '04d' => '04d.png',
+    '04n' => '04n.png',
+    '09d' => '09d.png',
+    '09n' => '09n.png',
+    '10d' => '10d.png',
+    '10n' => '10n.png',
+    '11d' => '11d.png',
+    '11n' => '11n.png',
+    '13d' => '13d.png',
+    '13n' => '13n.png',
+    '50d' => '50d.png',
+    '50n' => '50n.png'
+];
+
+
 if ($user_id) {
-    $stmt = $conn->prepare("SELECT lokasi FROM user WHERE id = ?");
+    $stmt = $conn->prepare("SELECT lat, lng FROM user WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-    if (!empty($row['lokasi'])) {
-        list($lat, $lon) = array_map('trim', explode(',', $row['lokasi']));
+    if ($row = $result->fetch_assoc()) {
+        $lat = $row['lat'];
+        $lon = $row['lng'];
     }
 }
 
@@ -23,31 +46,61 @@ if ($lat && $lon) {
     $cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid={$apikey}&units=metric&lang=id";
     $forecastURL = "https://api.openweathermap.org/data/2.5/forecast?lat={$lat}&lon={$lon}&appid={$apikey}&units=metric&lang=id";
 } else {
-    $kota = 'Bandung';
-    $cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?q={$kota}&appid={$apikey}&units=metric&lang=id";
-    $forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q={$kota}&appid={$apikey}&units=metric&lang=id";
+    $defaultLat = -6.917464;
+    $defaultLon = 107.619123;
+    $cuacaSekarangURL = "https://api.openweathermap.org/data/2.5/weather?lat={$defaultLat}&lon={$defaultLon}&appid={$apikey}&units=metric&lang=id";
+    $forecastURL = "https://api.openweathermap.org/data/2.5/forecast?lat={$defaultLat}&lon={$defaultLon}&appid={$apikey}&units=metric&lang=id";
 }
+
 
 $cuacaNow = json_decode(file_get_contents($cuacaSekarangURL), true);
 $forecast = json_decode(file_get_contents($forecastURL), true);
 
+
 $suhu = isset($cuacaNow['main']['temp']) ? round($cuacaNow['main']['temp']) : 0;
 $cuaca = isset($cuacaNow['weather'][0]['description']) ? ucfirst($cuacaNow['weather'][0]['description']) : 'Tidak tersedia';
-$icon = isset($cuacaNow['weather'][0]['icon']) ? $cuacaNow['weather'][0]['icon'] : '01d';
-$iconPath = file_exists("asset/weather/{$icon}.png") ? "asset/weather/{$icon}.png" : "asset/weather/01d.png";
+$icon = $cuacaNow['weather'][0]['icon'] ?? '01d';
+$iconFile = $iconMapping[$icon] ?? '01d.png';
+$iconPath = "asset/weather/" . $iconFile;
+
+date_default_timezone_set('Asia/Jakarta');
 
 $prediksi = [];
+
 if (!empty($forecast['list'])) {
-    $interval = floor(count($forecast['list']) / 4);
-    for ($i = 0; $i < 4; $i++) {
-        $data = $forecast['list'][$i * $interval];
-        $prediksi[] = [
-            'cuaca' => ucfirst($data['weather'][0]['description']),
-            'suhu' => round($data['main']['temp']),
-            'icon' => "asset/weather/" . ($data['weather'][0]['icon'] ?? '01d') . ".png"
-        ];
+    $prediksi = [];
+
+    $now = time();
+    $nextDay = strtotime('+1 day', strtotime(date('Y-m-d', $now))); // besok jam 00:00
+
+    $counter = 0;
+
+    foreach ($forecast['list'] as $data) {
+        $timestampUTC = strtotime($data['dt_txt']);
+        $waktuLokal = $timestampUTC + (7 * 3600); // konversi UTC ke WIB
+
+        // Ambil data hanya jika waktunya >= besok
+        if ($waktuLokal >= $nextDay) {
+            // Ambil hanya setiap 9 jam (0, 9, 18) → ambil 1 per 3 iterasi (karena data tiap 3 jam)
+            if ($counter % 3 === 0) {
+                $iconCode = $data['weather'][0]['icon'] ?? '01d';
+                $iconFile = isset($iconMapping[$iconCode]) ? $iconMapping[$iconCode] : '01d.png';
+
+                $prediksi[] = [
+                    'tanggal' => date('Y-m-d H:i:s', $waktuLokal),
+                    'cuaca'   => ucfirst($data['weather'][0]['description']),
+                    'suhu'    => round($data['main']['temp']),
+                    'icon'    => "asset/weather/" . $iconFile
+                ];
+            }
+            $counter++;
+        }
     }
 }
+
+
+
+
 
 $avg_temp = 0;
 $rainy_day = 0;
@@ -146,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Panel Cuaca -->
-        <div class="hovers bg-[#1D6034] rounded-xl shadow p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">    
+        <div class="hovers bg-[#1D6034] rounded-xl shadow p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">
             <div class="flex justify-center items-center flex-col">
                 <h2 class="text-lg sm:text-xl  font-medium">Cuaca Hari Ini</h2>
                 <p class="text-lg sm:text-xl font-semibold "><?= $cuaca ?></p>
@@ -154,7 +207,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </div>
             <div class="flex justify-center items-center flex-col bg-[#2C8F53] w-full rounded-xl">
-                <img src="asset/weather/<?= $icon ?>.png" class="w-26 h-26 mb-2">
+                <img src="<?= $iconPath ?>" class="w-26 h-26 mb-2" alt="icon cuaca hari ini">
+
             </div>
 
         </div>
@@ -164,32 +218,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     <div class="w-full overflow-x-auto mt-4 px-2 mx-auto">
-        <!-- Kontainer scroll horizontal di mobile -->
-        <div class="mx-auto bg-[#1D6034] text-[#ffff] p-4 rounded-xl shadow w-max sm:w-full min-w-[600px] sm:min-w-full">
+        <div class="mx-auto bg-[#1D6034] text-white p-4 rounded-xl shadow w-max min-w-[600px]">
             <p class="text-xl font-semibold mb-4">Perkiraan Cuaca</p>
 
-            <!-- Kontainer scroll (khusus isi kartu-kartu) -->
-            <div class="flex gap-4 overflow-x-auto px-2 pb-2 flex justify-self-center">
+            <!-- Kontainer scroll (aktif di semua ukuran layar) -->
+            <div class="flex gap-4 overflow-x-auto px-2 pb-2">
                 <?php
                 $hariIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                $index = 1;
                 ?>
                 <?php foreach ($prediksi as $p): ?>
                     <?php
-                    $tanggal = strtotime("+$index day");
-                    $hari = $hariIndo[date('w', $tanggal)];
-                    $index++;
+                    $tanggalTimestamp = strtotime($p['tanggal']);
+                    $hari = $hariIndo[date('w', $tanggalTimestamp)];
+                    $jam = date('H:i', $tanggalTimestamp);
                     ?>
                     <div class="flex-shrink-0 bg-[#2C8F53] rounded-xl shadow p-4 w-32 sm:w-40 text-center hover-gelap">
-                        <p class="text-sm font-medium mb-1 truncate"><?= $hari ?></p>
+                        <p class="text-sm font-medium mb-1 truncate"><?= $hari ?> <?= $jam ?></p>
                         <img src="<?= $p['icon'] ?>" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
-                        <p class="text-xs sm:text-sm font-semibold leading-tight line-clamp-2"><?= $p['cuaca'] ?></p>
+                        <p class="text-xs sm:text-sm font-semibold leading-tight"><?= $p['cuaca'] ?></p>
                         <p class="text-sm"><?= $p['suhu'] ?>°C</p>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
+
 
 
 
@@ -290,11 +343,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Modal -->
         <div id="faseModal" class="hidden fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-            <div class="bg-white rounded-2xl p-6 shadow-xl w-[90%] max-w-md animate-fade-in-up">
+            <div class="bg-white rounded-lg p-6 shadow-xl w-[90%] max-w-md animate-fade-in-up">
                 <h2 id="modalTitle" class="text-lg font-semibold text-gray-800 mb-2"></h2>
                 <p id="faseText" class="text-gray-600 whitespace-pre-line"></p>
                 <div class="text-right mt-4">
-                    <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <button onclick="closeModal()" class="bg-[#2C8F53] text-white px-4 py-2 rounded-lg hover:bg-[#1D6034] transition">
                         Tutup
                     </button>
                 </div>
@@ -395,7 +448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Form Konsultasi Manual -->
                     <div class="bg-white rounded-xl shadow p-4">
                         <h3 class="text-lg font-semibold text-[#1D6034] mb-2">📤 Konsultasi Manual</h3>
-                        <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">    
+                        <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <fieldset class="fieldset">
                                 <legend class="fieldset-legend">Deskripsikan Gejalanya</legend>
                                 <textarea class="textarea h-24" placeholder="Daun menguning sejak 3 hari ..." required name="gejala"></textarea>
