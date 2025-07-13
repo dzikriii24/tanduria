@@ -10,6 +10,7 @@ if ($conn->connect_error) {
 }
 
 session_start();
+$user_id = $_SESSION['user_id'];
 
 // Proses simpan data jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -51,9 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit;
   }
 }
-
-
-$user_id = $_SESSION['user_id'];
 
 
 $stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? ORDER BY id DESC");

@@ -71,7 +71,7 @@ if (!empty($forecast['list'])) {
     $prediksi = [];
 
     $now = time();
-    $nextDay = strtotime('+1 day', strtotime(date('Y-m-d', $now))); // besok jam 00:00
+    $nextDay = strtotime('+8 hours', $now);
 
     $counter = 0;
 
@@ -81,7 +81,7 @@ if (!empty($forecast['list'])) {
 
         // Ambil data hanya jika waktunya >= besok
         if ($waktuLokal >= $nextDay) {
-            // Ambil hanya setiap 9 jam (0, 9, 18) → ambil 1 per 3 iterasi (karena data tiap 3 jam)
+            
             if ($counter % 3 === 0) {
                 $iconCode = $data['weather'][0]['icon'] ?? '01d';
                 $iconFile = isset($iconMapping[$iconCode]) ? $iconMapping[$iconCode] : '01d.png';
@@ -154,6 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Tanduria</title>
     <style type="text/tailwind">
     </style>
@@ -428,7 +429,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </h3>
                             </a>
 
-                            <ul class="list-disc list-inside space-y-1 text-sm">
+                            <ul class="list-disc list-inside space-y-1 text-sm italic">
                                 <li>Wereng Coklat</li>
                                 <li>Blast (Hawar Daun)</li>
                                 <li>Penggerek Batang</li>
@@ -459,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="file" class="file-input" name="foto" accept="image/*" />
                                 <label class="label">Opsional</label>
                             </fieldset>
-                            <button type="submit" class="bg-[#2C8F53] hover:bg-[#1D6034] text-white px-4 py-2 rounded">
+                            <button type="submit" class="bg-[#2C8F53] hover:bg-[#1D6034] text-white px-4 py-2 rounded" onclick="kirim(); " disabled>
                                 Kirim Konsultasi
                             </button>
                         </form>
@@ -539,6 +540,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="javascript/chart.js"></script>
     <script src="javascript/index.js"></script>
+    <script src="javascript/other.js"></script>
 </body>
 
 </html>

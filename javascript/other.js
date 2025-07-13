@@ -32,3 +32,31 @@
             }
         });
     }
+
+
+    function kirim() {
+        Swal.fire({
+            title: "Berhasil dikirim!",
+            text: "Tunggu respon di notifikasi yaa!",
+            icon: "success",
+            draggable: true
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const textarea = document.querySelector('textarea[name="gejala"]');
+        const submitButton = document.querySelector('#formKonsultasi button[type="submit"]');
+
+        function cekForm() {
+            if (textarea.value.trim().length > 0) {
+                submitButton.disabled = false;
+                submitButton.classList.remove("opacity-50", "cursor-not-allowed");
+            } else {
+                submitButton.disabled = true;
+                submitButton.classList.add("opacity-50", "cursor-not-allowed");
+            }
+        }
+
+        textarea.addEventListener("input", cekForm);
+        cekForm(); // Jalankan sekali saat halaman dimuat
+    });
