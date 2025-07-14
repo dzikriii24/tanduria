@@ -64,12 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<<<<<<< HEAD
 
-<body class="bg-gradient-to-br from-indigo-500 via-blue-600 to-purple-600 min-h-screen flex justify-center px-4 py-12 sm:py-16 overflow-auto">
-=======
 <body class=" bg-gradient-to-b from-[#006138] to-[#009158] min-h-screen flex justify-center px-4 py-12 sm:py-16 overflow-auto">
->>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
   <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl animate__animated animate__fadeIn">
     <div class="text-center mb-6">
       <img src="https://cdn-icons-png.flaticon.com/512/942/942748.png" class="w-16 h-16 mx-auto animate-bounce" alt="user icon">
@@ -121,18 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
       <div>
-<<<<<<< HEAD
-        <label class="block mb-1 font-medium text-gray-700">Foto Profil</label>
-        <div class="flex items-center gap-3">
-          <label for="uploadFoto"
-            class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 transition text-white px-4 py-2 rounded-md flex items-center gap-2 shadow">
-            <i class="ph ph-folder text-lg"></i> Pilih Foto
-          </label>
-          <span id="fileName" class="text-sm text-gray-600">Belum ada file</span>
-        </div>
-        <input type="file" name="foto" id="uploadFoto" accept="image/*" class="hidden" />
-      </div>
-=======
+
   <label class="block mb-1 font-medium text-gray-700">Foto Profil</label>
   <div class="flex items-center gap-3">
     <label for="uploadFoto"
@@ -143,17 +128,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
   <input type="file" name="foto" id="uploadFoto" accept="image/*" class="hidden" />
 </div>
->>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
+
 
       <input type="hidden" name="lokasi" id="lokasi">
 
       <div>
         <button type="submit"
-<<<<<<< HEAD
-          class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition duration-200 shadow-lg">
-=======
                 class="w-full bg-[#009158] text-white font-bold py-3 rounded-xl hover:bg-[#006138] transition duration-200 shadow-lg">
->>>>>>> 16a261fd900c72f2e7337eb997823d26f9dec1da
           <i class="ph ph-user-plus mr-2"></i>Daftar
         </button>
       </div>

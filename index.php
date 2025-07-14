@@ -403,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 </a>
-                <a href="php/formPerencanaan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                <a href="php/Perencanaan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
                             <img
