@@ -1,32 +1,37 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "tanduria");
-$id = (int) ($_GET['id'] ?? 0);
-
-$stmt = $conn->prepare("SELECT * FROM konsultasi WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$data = $stmt->get_result()->fetch_assoc();
-
-if (!$data) {
-    echo "Data tidak ditemukan!";
-    exit;
-}
+require '../php/db.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_konsultasi = $_POST['id_konsultasi'];
+    $id_konsultasi = (int) ($_POST['id_konsultasi'] ?? 0);
     $nama_masalah = $_POST['nama_masalah'] ?? '';
     $detail_masalah = $_POST['detail_masalah'] ?? '';
     $cara_mengatasi = $_POST['cara_mengatasi'] ?? '';
 
-    $stmt = $conn->prepare("INSERT INTO response (id_konsultasi, nama_masalah, detail_masalah, cara_mengatasi) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $id_konsultasi, $nama_masalah, $detail_masalah, $cara_mengatasi);
-    $stmt->execute();
+    if ($id_konsultasi > 0) {
+        // Cek apakah konsultasi ada
+        $cek = $conn->query("SELECT * FROM konsultasi WHERE id = $id_konsultasi");
+        if ($cek->num_rows > 0) {
+            // Simpan respon
+            $stmt = $conn->prepare("INSERT INTO respon_konsultasi (id_konsultasi, nama_masalah, detail_masalah, cara_mengatasi, status) VALUES (?, ?, ?, ?, 'respon')");
+            $stmt->bind_param("isss", $id_konsultasi, $nama_masalah, $detail_masalah, $cara_mengatasi);
+            $stmt->execute();
 
-    header("Location: solve.php?id=$id_konsultasi&success=1");
-    exit;
+            // Update status di konsultasi
+            $conn->query("UPDATE konsultasi SET status = 'respon', sudah_dibaca = 0 WHERE id = $id_konsultasi");
+
+            header("Location: ../admin/konsultasi.php?success=1");
+            exit;
+        } else {
+            echo "Data konsultasi tidak ditemukan.";
+        }
+    } else {
+        echo "ID konsultasi tidak valid.";
+    }
 }
-
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en" class="bg-[#F5F2EB] overflow-x-hidden">
 
@@ -76,28 +81,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         <div class="mt-10 px-4 mx-auto w-full">
-            <form method="POST" action="solve.php?id=<?= $_GET['id'] ?>">
+            <form method="POST" action="solve.php">
                 <input type="hidden" name="id_konsultasi" value="<?= $_GET['id'] ?>">
+
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Nama Masalah</legend>
-                    <input type="text" class="input" placeholder="Type here" name="nama_masalah" />
-                    <p class="label">Optional</p>
+                    <input type="text" class="input" name="nama_masalah" required>
                 </fieldset>
 
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Detail Masalah</legend>
-                    <textarea class="textarea h-24" placeholder="Desc" name="detail_masalah"></textarea>
-                    <div class="label">Optional</div>
+                    <textarea class="textarea h-24" name="detail_masalah"></textarea>
                 </fieldset>
 
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Cara Mengatasi</legend>
-                    <textarea class="textarea h-24" placeholder="Desc" name="cara_mengatasi"></textarea>
-                    <div class="label">Optional</div>
+                    <textarea class="textarea h-24" name="cara_mengatasi" required></textarea>
                 </fieldset>
 
-                <button class="btn btn-soft btn-success mt-4" type="submit">Kirim</button>
+                <button type="submit" class="btn btn-soft btn-success mt-4">Kirim</button>
             </form>
+
+
 
         </div>
 

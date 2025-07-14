@@ -93,6 +93,14 @@ foreach ($hargaSemuaProvinsi as $row) {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 overflow-x-hidden">
+
+
+
+<div>
+  <iframe src="http://localhost:8501/" frameborder="0" class="w-full h-[500px]"></iframe>
+</div>
+
+
 <div class="w-full max-w-7xl mx-auto p-4 md:p-6">
   <form method="get" class="mb-4">
     <label for="provinsi" class="block mb-2 font-semibold">Pilih Provinsi untuk Chart:</label>

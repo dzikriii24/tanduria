@@ -101,14 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- Upload Foto -->
   <div>
-    <label class="block mb-1 font-medium">Foto Baru (Opsional)</label>
+    <label class="block mb-1 font-medium">Foto Baru</label>
     <input type="file" name="foto" accept="image/*" class="w-full border rounded-lg px-4 py-2" />
   </div>
 
   <!-- Tombol -->
   <div class="flex justify-between mt-6 gap-4">
     <a href="profile.php" class="w-1/2 text-center bg-gray-200 py-3 rounded-lg hover:bg-gray-300">Kembali</a>
-    <button type="submit" class="w-1/2 bg-[#2129B3] text-white py-3 rounded-lg hover:bg-blue-900">
+    <button type="submit" class="w-1/2 bg-[#006138] text-white py-3 rounded-lg hover:bg-[#009158]">
       Simpan Perubahan
     </button>
   </div>
