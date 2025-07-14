@@ -81,7 +81,7 @@ if (!empty($forecast['list'])) {
 
         // Ambil data hanya jika waktunya >= besok
         if ($waktuLokal >= $nextDay) {
-            
+
             if ($counter % 3 === 0) {
                 $iconCode = $data['weather'][0]['icon'] ?? '01d';
                 $iconFile = isset($iconMapping[$iconCode]) ? $iconMapping[$iconCode] : '01d.png';
@@ -481,20 +481,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bottom Navigation Dock -->
     <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
         <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
-            <!-- Home -->
-            <a href="index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all active-nav">
-                <i class="fi fi-sr-home text-lg text-[#1D6034]"></i>
-                <span class="text-[#1D6034]">Dashboard</span>
+
+            <!-- Dashboard -->
+            <a href="index.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
+                <i class="fi fi-sr-home text-lg"></i>
+                <span>Dashboard</span>
             </a>
 
-            <!-- Bookmark -->
-            <a href="php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-                <i class="fi fi-ss-bell text-lg"></i>
+            <!-- Notifikasi -->
+            <a href="php/notifikasi.php" class="group flex flex-col items-center justify-center py-2 relative hover:text-[#1D6034] transition-all">
+                <div class="relative">
+                    <i class="fi fi-ss-bell text-lg"></i>
+                    <span id="notif-badge" class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1 text-[10px] hidden">0</span>
+                </div>
                 <span>Notifikasi</span>
             </a>
 
-            <!-- Post -->
-            <a href="php/lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+            <!-- Lahan -->
+            <a href="php/lahan.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
                     <i class="fi fi-sr-land-layers text-xl"></i>
                 </div>
@@ -502,18 +506,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <!-- Edukasi -->
-            <a href="php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+            <a href="php/edukasi.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <i class="fi fi-ss-book-open-cover text-lg"></i>
                 <span>Edukasi</span>
             </a>
-            <!-- Settings -->
-            <a href="php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+
+            <!-- Profil -->
+            <a href="php/profile.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>
 
         </div>
     </div>
+
 
     <!-- Jotform AI Chatbot -->
     <script>
@@ -526,6 +532,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 window.location.href = "php/login.php"; // redirect ke login jika ingin
             }
         });
+
+        function cekNotifBadge() {
+            fetch("php/function/getNotif.php")
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById("notif-badge");
+                    if (data.total > 0) {
+                        badge.innerText = data.total > 9 ? "9+" : data.total;
+                        badge.style.display = "inline";
+                    } else {
+                        badge.style.display = "none";
+                    }
+                });
+        }
+
+        setInterval(cekNotifBadge, 10000);
+        cekNotifBadge();
     </script>
 
 

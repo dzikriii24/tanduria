@@ -78,7 +78,7 @@ if ($lat && $lng) {
 
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="#F5F2EB">
 
 <head>
   <meta charset="UTF-8">
@@ -97,225 +97,159 @@ if ($lat && $lng) {
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/font.css">
   <link rel="stylesheet" href="../css/hover.css">
+  <link rel="stylesheet" href="../css/icon.css">
 
 </head>
 
-<body class="">
-  <div class="navbar bg-base-100 shadow-sm">
-    <p class="text-xl">Profil Anda</p>
+<body class="poppins-reguler">
+  <div class="navbar shadow-sm bg-[#1D6034] text-white">
+    <p class="text-xl font-semibold">Profil Anda</p>
   </div>
 
   <div>
 
-    <div class="sm:flex sm:justify-between">
+    <div class="sm:flex sm:justify-between shadow-sm">
 
       <!-- Head Profile -->
-      <div class="flex justify-self-start">
+      <div class="flex justify-self-start pb-4">
         <div class="avatar px-4 mx-auto mt-4 grid grid-cols-2">
-          <div class="w-30 h-30 rounded-full">
+          <div class="w-30 h-30 rounded-full cursor-pointer" onclick="showFotoModal()">
             <?php if (!empty($user['foto']) && file_exists($user['foto'])): ?>
-              <img src="<?= $user['foto'] ?>" alt="Foto Profil" class="w-full h-full object-cover">
+              <img src="<?= $user['foto'] ?>" alt="Foto Profil" class="w-full h-full object-cover" id="fotoProfilSrc">
             <?php else: ?>
-              <img src="uploads/default_user.jpg" alt="Default Foto" class="w-full h-full object-cover">
+              <img src="uploads/default_user.jpg" alt="Default Foto" class="w-full h-full object-cover" id="fotoProfilSrc">
             <?php endif; ?>
           </div>
+
+          <dialog id="my_modal_foto" class="modal">
+            <div class="modal-box p-0 max-w-[80vw] max-h-[80vh] flex justify-center items-center">
+              <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+              </form>
+              <img id="modalFotoImage" src="" alt="Foto" class="max-w-full max-h-full rounded-lg">
+            </div>
+          </dialog>
 
         </div>
         <div class="collapse">
           <input type="radio" name="my-accordion-1" checked="checked" />
-          <div class="collapse-title font-semibold"><?= htmlspecialchars($user['nama']) ?> <p class="text-sm font-reguler"><?= htmlspecialchars($user['email']) ?></p></div>
-          <div class="collapse-content text-sm"><?= htmlspecialchars($lokasi_nama) ?></div>
-          <div class="mt-2 text-sm"></div>
-          <a href="update_profile.php" class="btn btn-sm sm:w-40">Edit Profile</a>
+          <div class="collapse-title">
+            <p class="font-semibold text-[#1D6034]"><?= htmlspecialchars($user['nama']) ?></p>
+            <p class="text-sm font-reguler opacity-75 text-[#4E4E4E]"><?= htmlspecialchars($user['email']) ?></p>
+          </div>
+          <div class="collapse-content text-sm text-[#4E4E4E]"><?= htmlspecialchars($lokasi_nama) ?></div>
+          <div class="mt-2 text-sm">
+            <a href="update_profile.php" class="btn btn-active btn-primary btn-sm">Edit Profile</a>
+          </div>
+
         </div>
       </div>
 
 
 
       <!-- Stat -->
-      <div class="stats shadow mt-10 sm:mt-4">
-        <div class="stat">
-          <div class="stat-figure text-secondary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              class="inline-block h-8 w-8 stroke-current">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <div class="stats shadow mt-6 sm:mt-4 w-[42 0px] sm:w-[50%] mb-4">
+        <div class="stat bg-[#A3CC5A] text-white">
+          <div class="stat-figure">
+            <i class="fi fi-sr-layer-plus text-xl sm:text-3xl"></i>
           </div>
-          <div class="stat-title">Total Lahan</div>
+          <div class="stat-title" style="color:white">Total Lahan</div>
           <div class="stat-value"><?= $totalLahan ?></div>
-          <div class="stat-desc">Lahan</div>
+          <div class="stat-desc" style="color:white">Lahan</div>
         </div>
 
-        <div class="stat">
-          <div class="stat-figure text-secondary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              class="inline-block h-8 w-8 stroke-current">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-            </svg>
+        <div class="stat bg-[#2C8F53] text-white">
+          <div class="stat-figure">
+            <i class="fi fi-sr-wheat-awn-circle-exclamation text-xl sm:text-3xl"></i>
           </div>
-          <div class="stat-title">Total Lahan Panen</div>
+          <div class="stat-title" style="color:white">Total Panen</div>
           <div class="stat-value"><?= $jumlahPanen ?></div>
-          <div class="stat-desc">Lahan Panen</div>
+          <div class="stat-desc" style="color:white">Lahan</div>
         </div>
 
-        <div class="stat">
-          <div class="stat-figure text-secondary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              class="inline-block h-8 w-8 stroke-current">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-            </svg>
+        <div class="stat bg-[#1D6034] text-white">
+          <div class="stat-figure">
+            <i class="fi fi-ss-rectangle-history-circle-plus text-xl sm:text-3xl"></i>
           </div>
-          <div class="stat-title">Total Luas Lahan</div>
+          <div class="stat-title" style="color:white">Total Luas</div>
           <div class="stat-value"><?= $totalHektar ?></div>
-          <div class="stat-desc">Hektare</div>
+          <div class="stat-desc" style="color:white">Hektare</div>
         </div>
       </div>
 
 
     </div>
 
+    <div class="mt-10 mx-auto px-2 mb-40">
+      <div class="flow-root">
+        <dl class="-my-3 divide-y divide-gray-200 rounded border border-[#4E4E4E]/20 text-lg">
+          <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt class="font-medium text-gray-900">Status</dt>
 
+            <dd class="text-gray-700 sm:col-span-2">Petani</dd>
+          </div>
 
+          <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt class="font-medium text-gray-900">Jenis Kelamin</dt>
 
+            <dd class="text-gray-700 sm:col-span-2"> <?= htmlspecialchars($user['jenis_kelamin']) ?></dd>
+          </div>
 
+          <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt class="font-medium text-gray-900">Nomor Telepon</dt>
 
+            <dd class="text-gray-700 sm:col-span-2"><?= htmlspecialchars($user['no_telepon']) ?></dd>
+          </div>
 
+          <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+            <dt class="font-medium text-gray-900">Log Out</dt>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Container Full Width -->
-    <div class="w-full px-4 py-10 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-
-      <!-- Tombol Data -->
-      <div class="mt-8 space-y-4 w-full">
-        <!-- Nama lengkap -->
-        <!-- <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-        Nama Lengkap: <?= htmlspecialchars($user['nama']) ?>
-      </button> -->
-
-        <!-- No Telepon -->
-        <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-          Nomor Telepon: <?= htmlspecialchars($user['no_telepon']) ?>
-          =======
-          <!-- No Telepon -->
-          <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-            <?= htmlspecialchars($user['no_telepon']) ?>
-          </button>
-
-          <!-- Jenis Kelamin -->
-          <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-            <?= htmlspecialchars($user['jenis_kelamin']) ?>
-          </button>
-      </div>
-
-      <!-- Tombol Update Profil -->
-      <div class="mt-10">
-
-
-        <!-- Jenis Kelamin -->
-        <button class="w-full border border-gray-400 rounded-lg py-3 text-base md:text-lg hover:bg-gray-100 transition">
-          Jenis Kelamin: <?= htmlspecialchars($user['jenis_kelamin']) ?>
-        </button>
-      </div>
-
-      <!-- Tombol Update Profil -->
-      <div class="mt-10">
-
-      </div>
-
-
-      <!-- Bottom Navigation Dock -->
-      <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
-        <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
-          <!-- Home -->
-          <a href="../index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all active-nav">
-            <i class="fi fi-sr-home text-lg"></i>
-            <span class="">Dashboard</span>
-          </a>
-
-          <!-- Bookmark -->
-          <a href="notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-            <i class="fi fi-ss-bell text-lg"></i>
-            <span>Notifikasi</span>
-          </a>
-
-          <!-- Post -->
-          <a href="" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-            <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
-              <i class="fi fi-sr-land-layers text-xl"></i>
-            </div>
-            <span class="mt-1">Lahan</span>
-          </a>
-
-          <!-- Search -->
-          <a href="edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-            <i class="fi fi-ss-book-open-cover text-lg"></i>
-            <span>Edukasi</span>
-          </a>
-          <!-- Settings -->
-          <a href="profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-            <i class="fi fi-sr-user text-lg text-[#1D6034]"></i>
-            <span class="text-[#1D6034]">Profil</span>
-          </a>
-        </div>
+            <dd class="text-gray-700 sm:col-span-2"><button onclick="confirmLogout()"
+                class="mt-4 w-30 bg-[#C23132] text-white font-medium p-2 rounded-sm text-base md:text-sm hover:bg-red-600 transition">
+                Logout
+              </button></dd>
+          </div>
+        </dl>
       </div>
     </div>
-    <div class="mt-2">
-      <button onclick="confirmLogout()"
-        class="w-full bg-[#C23132] text-white font-medium py-3 rounded-lg text-base md:text-lg hover:bg-red-600 transition">
-        Logout
-      </button>
+
+
+    <!-- Bottom Navigation Dock -->
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
+      <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
+        <!-- Home -->
+        <a href="../index.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all active-nav">
+          <i class="fi fi-sr-home text-lg"></i>
+          <span class="">Dashboard</span>
+        </a>
+
+        <!-- Bookmark -->
+        <a href="notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+          <i class="fi fi-ss-bell text-lg"></i>
+          <span>Notifikasi</span>
+        </a>
+
+        <!-- Post -->
+        <a href="" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+          <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
+            <i class="fi fi-sr-land-layers text-xl"></i>
+          </div>
+          <span class="mt-1">Lahan</span>
+        </a>
+
+        <!-- Search -->
+        <a href="edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+          <i class="fi fi-ss-book-open-cover text-lg"></i>
+          <span>Edukasi</span>
+        </a>
+        <!-- Settings -->
+        <a href="profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+          <i class="fi fi-sr-user text-lg text-[#1D6034]"></i>
+          <span class="text-[#1D6034]">Profil</span>
+        </a>
+      </div>
     </div>
+  </div>
 
   </div>
   <!-- SweetAlert Login Berhasil -->

@@ -10,7 +10,6 @@ if ($conn->connect_error) {
 }
 
 session_start();
-$user_id = $_SESSION['user_id'];
 
 // Proses simpan data jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -53,6 +52,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 }
 
+
+$user_id = $_SESSION['user_id'];
+
+if(!$user_id){
+ echo "<script>alert('harus login terlebih dahulu')</script>";
+  header("Location: login.php");
+};
 
 $stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? ORDER BY id DESC");
 $stmt->bind_param("i", $user_id);
