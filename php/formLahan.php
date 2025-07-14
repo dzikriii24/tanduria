@@ -94,7 +94,7 @@
       <a href="https://www.google.com/maps" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
         🌍 Buka Google Maps
       </a>
-      <span class="text-xs text-gray-500">Klik dan salin link dari address bar </span>
+      <span class="text-xs text-gray-500">Klik dan salin link </span>
     </div>
   </div>
 </div>
