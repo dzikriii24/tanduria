@@ -23,7 +23,7 @@ function getRedirectLocation($url) {
   curl_setopt($ch, CURLOPT_NOBODY, true);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0"); // biar ga diblok Google
+  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
   $headers = curl_exec($ch);
   curl_close($ch);
 
@@ -71,6 +71,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit;
   }
 
+  // Konversi koordinat agar tidak dipotong
+  $lat = floatval($lat);
+  $lng = floatval($lng);
+
   // 📷 Upload File
   $fotoName = $_FILES['fotoLahan']['name'];
   $tmpPath  = $_FILES['fotoLahan']['tmp_name'];
@@ -87,11 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam,
       foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
+    
     $stmt->bind_param(
-      "isisssssssiis",
+      "isisssssssidd",
       $user_id, $nama, $luas, $tempat, $jenis, $tanam,
-      $newFileName, $deskripsi, $maps, $pestisida, $modal, $lat, $lng
+      $newFileName, $deskripsi, $maps, $pestisida, $modal,
+      $lat, $lng
     );
     
     if ($stmt->execute()) {
@@ -121,6 +126,7 @@ while ($row = $result->fetch_assoc()) {
 
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
