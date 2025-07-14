@@ -1,19 +1,23 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "tanduria");
-$id = (int) ($_GET['id'] ?? 0);
+require '../php/db.php';
+session_start();
 
-$stmt = $conn->prepare("SELECT * FROM konsultasi WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$data = $stmt->get_result()->fetch_assoc();
+$id_konsultasi = (int) ($_GET['id'] ?? $_POST['id_konsultasi'] ?? 0);
 
-if (!$data) {
-    echo "Data tidak ditemukan!";
-    exit;
+// Ambil data konsultasi jika ada ID
+if ($id_konsultasi > 0) {
+    $result = $conn->query("SELECT * FROM konsultasi WHERE id = $id_konsultasi");
+    if ($result && $result->num_rows > 0) {
+        $data = $result->fetch_assoc();
+    } else {
+        die("Data konsultasi tidak ditemukan.");
+    }
+} else {
+    die("ID konsultasi tidak valid.");
 }
 
+// Proses submit form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_konsultasi = $_POST['id_konsultasi'];
     $nama_masalah = $_POST['nama_masalah'] ?? '';
     $detail_masalah = $_POST['detail_masalah'] ?? '';
     $cara_mengatasi = $_POST['cara_mengatasi'] ?? '';
@@ -22,11 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("isss", $id_konsultasi, $nama_masalah, $detail_masalah, $cara_mengatasi);
     $stmt->execute();
 
-    header("Location: solve.php?id=$id_konsultasi&success=1");
+    $conn->query("UPDATE konsultasi SET status = 'respon', sudah_dibaca = 0 WHERE id = $id_konsultasi");
+
+    header("Location: ../admin/index.php?id=$id_konsultasi&success=1");
     exit;
 }
-
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en" class="bg-[#F5F2EB] overflow-x-hidden">
 
@@ -76,28 +84,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         <div class="mt-10 px-4 mx-auto w-full">
-            <form method="POST" action="solve.php?id=<?= $_GET['id'] ?>">
+            <form method="POST" action="solve.php">
                 <input type="hidden" name="id_konsultasi" value="<?= $_GET['id'] ?>">
+
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Nama Masalah</legend>
-                    <input type="text" class="input" placeholder="Type here" name="nama_masalah" />
-                    <p class="label">Optional</p>
+                    <input type="text" class="input" name="nama_masalah" required>
                 </fieldset>
 
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Detail Masalah</legend>
-                    <textarea class="textarea h-24" placeholder="Desc" name="detail_masalah"></textarea>
-                    <div class="label">Optional</div>
+                    <textarea class="textarea h-24" name="detail_masalah"></textarea>
                 </fieldset>
 
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">Cara Mengatasi</legend>
-                    <textarea class="textarea h-24" placeholder="Desc" name="cara_mengatasi"></textarea>
-                    <div class="label">Optional</div>
+                    <textarea class="textarea h-24" name="cara_mengatasi" required></textarea>
                 </fieldset>
 
-                <button class="btn btn-soft btn-success mt-4" type="submit">Kirim</button>
+                <button type="submit" class="btn btn-soft btn-success mt-4">Kirim</button>
             </form>
+
+
 
         </div>
 

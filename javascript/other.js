@@ -60,3 +60,9 @@
         textarea.addEventListener("input", cekForm);
         cekForm(); // Jalankan sekali saat halaman dimuat
     });
+
+    function showFotoModal() {
+        const src = document.getElementById("fotoProfilSrc").src;
+        document.getElementById("modalFotoImage").src = src;
+        my_modal_foto.showModal();
+    }
