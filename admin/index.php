@@ -1,7 +1,7 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "tanduria");
 
-$result = $conn->query("SELECT id, gejala, foto, waktu_kirim FROM konsultasi ORDER BY waktu_kirim DESC");
+$result = $conn->query("SELECT id, gejala, foto, waktu_kirim FROM konsultasi where status = 'belum' ORDER BY waktu_kirim DESC");
 ?>
 
 <!DOCTYPE html>

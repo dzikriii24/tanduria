@@ -2,34 +2,37 @@
 require '../php/db.php';
 session_start();
 
+$id_konsultasi = (int) ($_GET['id'] ?? $_POST['id_konsultasi'] ?? 0);
+
+// Ambil data konsultasi jika ada ID
+if ($id_konsultasi > 0) {
+    $result = $conn->query("SELECT * FROM konsultasi WHERE id = $id_konsultasi");
+    if ($result && $result->num_rows > 0) {
+        $data = $result->fetch_assoc();
+    } else {
+        die("Data konsultasi tidak ditemukan.");
+    }
+} else {
+    die("ID konsultasi tidak valid.");
+}
+
+// Proses submit form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_konsultasi = (int) ($_POST['id_konsultasi'] ?? 0);
     $nama_masalah = $_POST['nama_masalah'] ?? '';
     $detail_masalah = $_POST['detail_masalah'] ?? '';
     $cara_mengatasi = $_POST['cara_mengatasi'] ?? '';
 
-    if ($id_konsultasi > 0) {
-        // Cek apakah konsultasi ada
-        $cek = $conn->query("SELECT * FROM konsultasi WHERE id = $id_konsultasi");
-        if ($cek->num_rows > 0) {
-            // Simpan respon
-            $stmt = $conn->prepare("INSERT INTO respon_konsultasi (id_konsultasi, nama_masalah, detail_masalah, cara_mengatasi, status) VALUES (?, ?, ?, ?, 'respon')");
-            $stmt->bind_param("isss", $id_konsultasi, $nama_masalah, $detail_masalah, $cara_mengatasi);
-            $stmt->execute();
+    $stmt = $conn->prepare("INSERT INTO response (id_konsultasi, nama_masalah, detail_masalah, cara_mengatasi) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("isss", $id_konsultasi, $nama_masalah, $detail_masalah, $cara_mengatasi);
+    $stmt->execute();
 
-            // Update status di konsultasi
-            $conn->query("UPDATE konsultasi SET status = 'respon', sudah_dibaca = 0 WHERE id = $id_konsultasi");
+    $conn->query("UPDATE konsultasi SET status = 'respon', sudah_dibaca = 0 WHERE id = $id_konsultasi");
 
-            header("Location: ../admin/konsultasi.php?success=1");
-            exit;
-        } else {
-            echo "Data konsultasi tidak ditemukan.";
-        }
-    } else {
-        echo "ID konsultasi tidak valid.";
-    }
+    header("Location: ../admin/index.php?id=$id_konsultasi&success=1");
+    exit;
 }
 ?>
+
 
 
 <!DOCTYPE html>

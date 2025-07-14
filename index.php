@@ -484,8 +484,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Dashboard -->
             <a href="index.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
-                <i class="fi fi-sr-home text-lg"></i>
-                <span>Dashboard</span>
+                <i class="fi fi-sr-home text-lg text-[#1D6034]"></i>
+                <span class="text[#1D6034]">Dashboard</span>
             </a>
 
             <!-- Notifikasi -->

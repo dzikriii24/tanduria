@@ -66,20 +66,3 @@
         document.getElementById("modalFotoImage").src = src;
         my_modal_foto.showModal();
     }
-
-    function cekNotifBadge() {
-        fetch("../php/function/getNotif.php")
-            .then(res => res.json())
-            .then(data => {
-                const badge = document.getElementById("notif-badge");
-                if (data.total > 0) {
-                    badge.innerText = data.total > 9 ? "9+" : data.total;
-                    badge.style.display = "inline";
-                } else {
-                    badge.style.display = "none";
-                }
-            });
-    }
-
-    setInterval(cekNotifBadge, 10000);
-    cekNotifBadge();
