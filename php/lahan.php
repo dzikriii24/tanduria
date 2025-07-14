@@ -10,12 +10,38 @@ if ($conn->connect_error) {
 }
 
 session_start();
-
 if (!isset($_SESSION['user_id'])) {
   die("Anda belum login.");
 }
+$user_id = $_SESSION['user_id'];
 
-// Proses simpan data jika POST
+
+// 🔁 Fungsi untuk resolve link pendek dan ambil koordinat
+function getRedirectLocation($url) {
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_HEADER, true);
+  curl_setopt($ch, CURLOPT_NOBODY, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+  $headers = curl_exec($ch);
+  curl_close($ch);
+
+  if (preg_match('/Location: (.*)/i', $headers, $match)) {
+    return trim($match[1]);
+  }
+  return null;
+}
+
+function extractCoordinates($url) {
+  if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+    return ['lat' => $matches[1], 'lng' => $matches[2]];
+  }
+  return ['lat' => null, 'lng' => null];
+}
+
+
+// ✅ Simpan Data Jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $nama      = $_POST['namaLahan'];
   $luas      = $_POST['luasLahan'];
@@ -29,7 +55,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $lat       = $_POST['koordinatLat'];
   $lng       = $_POST['koordinatLng'];
 
-  // Upload file
+  // 🌐 Coba ambil koordinat dari link maps pendek jika lat/lng kosong
+  if ((!$lat || !$lng) && strpos($maps, 'https://maps.app.goo.gl') === 0) {
+    $resolved = getRedirectLocation($maps);
+    if ($resolved) {
+      $coords = extractCoordinates($resolved);
+      $lat = $coords['lat'];
+      $lng = $coords['lng'];
+    }
+  }
+
+  // ❌ Jika tetap tidak dapat koordinat
+  if (!$lat || !$lng) {
+    header("Location: formLahan.php?error=invalid_maps");
+    exit;
+  }
+
+  // Konversi koordinat agar tidak dipotong
+  $lat = floatval($lat);
+  $lng = floatval($lng);
+
+  // 📷 Upload File
   $fotoName = $_FILES['fotoLahan']['name'];
   $tmpPath  = $_FILES['fotoLahan']['tmp_name'];
   $targetDir = "uploads/";
@@ -45,11 +91,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam,
       foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
+    
     $stmt->bind_param(
-      "isisssssssiis",
+      "isisssssssidd",
       $user_id, $nama, $luas, $tempat, $jenis, $tanam,
-      $newFileName, $deskripsi, $maps, $pestisida, $modal, $lat, $lng
+      $newFileName, $deskripsi, $maps, $pestisida, $modal,
+      $lat, $lng
     );
     
     if ($stmt->execute()) {
@@ -66,24 +113,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 
-$user_id = $_SESSION['user_id'];
-
-if(!$user_id){
- echo "<script>alert('harus login terlebih dahulu')</script>";
-  header("Location: login.php");
-};
-
+// 🔄 Ambil semua data lahan user
 $stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? ORDER BY id DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
-// Ambil data lahan dari database
+
 $lahanData = [];
 while ($row = $result->fetch_assoc()) {
   $lahanData[] = $row;
 }
+
 $conn->close();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="id" class="bg-[#F5F2EB] overflow-x-hidden">
