@@ -75,11 +75,21 @@
           <textarea id="deskripsiLahan" name="deskripsiLahan" rows="3" class="w-full rounded-xl border px-4 py-2 text-sm resize-none focus:ring-green-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- Link Maps -->
-        <div class="md:col-span-2">
-          <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
-          <input type="url" id="linkMaps" name="linkMaps" placeholder="https://maps.google.com/..." class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
-        </div>
+ <!-- Link Maps -->
+<div class="md:col-span-2">
+  <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
+  
+  <div class="flex flex-col space-y-2">
+    <input type="url" id="linkMaps" name="linkMaps" placeholder="https://www.google.com/maps/place/.../@-6.9xxxx,107.6xxxx" class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
+
+    <div class="flex items-center space-x-2">
+      <a href="https://www.google.com/maps" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
+        🌍 Buka Google Maps
+      </a>
+      <span class="text-xs text-gray-500">Klik dan salin link dari address bar </span>
+    </div>
+  </div>
+</div>
 
         <!-- Pestisida -->
         <div>

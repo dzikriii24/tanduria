@@ -12,6 +12,10 @@ if ($conn->connect_error) {
 session_start();
 $user_id = $_SESSION['user_id'];
 
+if (!isset($_SESSION['user_id'])) {
+  die("Anda belum login.");
+}
+
 // Proses simpan data jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $nama      = $_POST['namaLahan'];
@@ -23,6 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $maps      = $_POST['linkMaps'];
   $pestisida = $_POST['pestisida'];
   $modal     = $_POST['modalTanam'];
+  $lat       = $_POST['koordinatLat'];
+  $lng       = $_POST['koordinatLng'];
 
   // Upload file
   $fotoName = $_FILES['fotoLahan']['name'];
@@ -36,10 +42,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $targetPath = $targetDir . $newFileName;
 
   if (move_uploaded_file($tmpPath, $targetPath)) {
-    $stmt = $conn->prepare("INSERT INTO lahan (nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam, foto_lahan, deskripsi, link_maps, pestisida, modal_tanam)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sisssssssi", $nama, $luas, $tempat, $jenis, $tanam, $newFileName, $deskripsi, $maps, $pestisida, $modal);
+    $stmt = $conn->prepare("INSERT INTO lahan (
+      user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam,
+      foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+    $stmt->bind_param(
+      "isisssssssiis",
+      $user_id, $nama, $luas, $tempat, $jenis, $tanam,
+      $newFileName, $deskripsi, $maps, $pestisida, $modal, $lat, $lng
+    );
+    
     if ($stmt->execute()) {
       header("Location: lahan.php?success=1");
       exit;
@@ -180,7 +193,7 @@ $conn->close();
         <a href="detailLahan.php?id=<?= $lahan['id'] ?>" class="block rounded-lg p-4 shadow-xs shadow-indigo-100 bg-[#2C8F53] hovers">
           <img
             alt=""
-            src="<?= htmlspecialchars($lahan['foto_lahan']) ?>"
+            src="uploads/<?= htmlspecialchars($lahan['foto_lahan']) ?>"
             class="h-56 w-full rounded-md object-cover" />
 
           <div class="mt-2">
