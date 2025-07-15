@@ -1,78 +1,88 @@
 <?php
 $provinsiDipilih = isset($_GET['provinsi']) ? $_GET['provinsi'] : 'Jawa Barat';
-$bulan = isset($_GET['bulan']) ? $_GET['bulan'] : 'Januari';
+$tahunChart = isset($_GET['tahun_chart']) ? intval($_GET['tahun_chart']) : date('Y');
+$tahunTabel = isset($_GET['tahun_tabel']) ? intval($_GET['tahun_tabel']) : 2024;
 $javaProvinces = ['Banten', 'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'DI Yogyakarta', 'Jawa Timur'];
-$bulanOrder = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+$labels = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
 function fetchData($url) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 20); // Tambahkan timeout agar tidak infinite
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
     $result = curl_exec($ch);
     curl_close($ch);
     return $result;
 }
 
-$response_full = fetchData("http://127.0.0.1:5000/api/gkp-full-data");
-$dataFull = $response_full ? json_decode($response_full, true) : [];
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    echo "<pre>JSON Error: " . json_last_error_msg() . "</pre>";
-    exit;
-}
-
-if (!$dataFull || !is_array($dataFull)) {
-    echo "<pre>";
-    echo "RAW JSON:\n";
-    var_dump($response_full);
-    echo "\n\njson_decode result:\n";
-    var_dump($dataFull);
-    echo "</pre>";
-    exit;
-}
-if (empty($dataFull)) {
-    echo "<pre>Data kosong atau tidak terbaca dari API</pre>";
-}
+$url_chart = "http://127.0.0.1:5000/api/gkp-per-bulan?province=" . urlencode($provinsiDipilih) . "&year=" . $tahunChart;
+$dataChartResponse = json_decode(fetchData($url_chart), true);
 
 
-$labels = [];
+
 $dataChart = [];
+foreach ($labels as $bln) {
+    $hargaBulan = 0;
+    if (isset($dataChartResponse['data'])) {
+        foreach ($dataChartResponse['data'] as $item) {
+            if ($item['month'] === $bln) {
+                $hargaBulan = round($item['avg_price']);
+                break;
+            }
+        }
+    }
+    $dataChart[] = $hargaBulan;
+}
 
-// Untuk chart provinsi dan bulan yang dipilih
-if (is_array($dataFull)) {
-    $filtered = array_filter($dataFull, function($item) use ($provinsiDipilih, $bulan) {
-        return $item['province'] === $provinsiDipilih && $item['month'] === $bulan;
-    });
+$url_summary = "http://127.0.0.1:5000/api/gkp-summary-latest";
+$dataSummary = json_decode(fetchData($url_summary), true);
 
-    // Sort data berdasarkan day
-    usort($filtered, function ($a, $b) {
-        return $a['day'] <=> $b['day'];
-    });
+$hargaSemuaProvinsi = [];
+if (isset($dataSummary['data'])) {
+    foreach ($dataSummary['data'] as $row) {
+        $hargaSemuaProvinsi[] = [
+            'provinsi' => $row['province'],
+            'harga' => round($row['avg_price']),
+        ];
+    }
+}
+$url_semua_provinsi = "http://127.0.0.1:5000/api/gkp-per-bulan-semua-provinsi?year=" . $tahunTabel;
+$dataSemuaProvinsiResponse = json_decode(fetchData($url_semua_provinsi), true);
 
-    foreach ($filtered as $row) {
-        $labels[] = $row['day'];
-        $dataChart[] = $row['price'];
+$provinsiBulan = [];
+
+if (isset($dataSemuaProvinsiResponse['data'])) {
+    foreach ($dataSemuaProvinsiResponse['data'] as $row) {
+        $provinsi = $row['province'];
+        $bulan = $row['month'];
+        $hargaRaw = $row['avg_price'];
+
+        if (in_array($provinsi, $javaProvinces)) {
+            if (
+                isset($row['avg_price']) &&
+                is_numeric($row['avg_price']) &&
+                !is_nan(floatval($row['avg_price'])) &&
+                $row['avg_price'] > 0
+            ) {
+                $provinsiBulan[$provinsi][$bulan] = round(floatval($row['avg_price']));
+            } else {
+                $provinsiBulan[$provinsi][$bulan] = 0;
+            }
+        }
+    }
+
+    // Lengkapi bulan yang kosong agar tabel tetap rapi
+    foreach ($provinsiBulan as $prov => $bulanHarga) {
+        $bulanHargaLengkap = [];
+        foreach ($labels as $bln) {
+            $bulanHargaLengkap[$bln] = isset($bulanHarga[$bln]) ? $bulanHarga[$bln] : 0;
+        }
+        $provinsiBulan[$prov] = $bulanHargaLengkap;
     }
 }
 
-// Harga rata-rata semua provinsi
-$hargaSemuaProvinsi = [];
-foreach ($javaProvinces as $prov) {
-    $provData = array_filter($dataFull, function ($item) use ($prov, $bulan) {
-        return $item['province'] === $prov && $item['month'] === $bulan;
-    });
 
-    $hargaList = array_column($provData, 'price');
-    $hargaRata = !empty($hargaList) ? array_sum($hargaList) / count($hargaList) : 0;
 
-    $hargaSemuaProvinsi[] = [
-        'provinsi' => $prov,
-        'harga' => round($hargaRata),
-    ];
-}
-
-// Harga rata-rata provinsi yang dipilih
 $hargaRataGkp = 0;
 foreach ($hargaSemuaProvinsi as $row) {
     if ($row['provinsi'] === $provinsiDipilih) {
@@ -80,6 +90,23 @@ foreach ($hargaSemuaProvinsi as $row) {
         break;
     }
 }
+
+$url_avg_januari = "http://127.0.0.1:5000/api/gkp-per-bulan-semua-provinsi?year=2024";
+$dataAvgJanuari = json_decode(fetchData($url_avg_januari), true);
+
+$hargaJanuariArray = [];
+
+if (isset($dataAvgJanuari['data'])) {
+    foreach ($dataAvgJanuari['data'] as $row) {
+        if ($row['month'] === 'Januari' && in_array($row['province'], $javaProvinces)) {
+            if (isset($row['avg_price']) && is_numeric($row['avg_price']) && $row['avg_price'] > 0) {
+                $hargaJanuariArray[] = floatval($row['avg_price']);
+            }
+        }
+    }
+}
+
+$hargaRataJanuari = count($hargaJanuariArray) > 0 ? round(array_sum($hargaJanuariArray) / count($hargaJanuariArray)) : 0;
 ?>
 
 
@@ -94,76 +121,99 @@ foreach ($hargaSemuaProvinsi as $row) {
 </head>
 <body class="bg-gray-50 text-gray-800 overflow-x-hidden">
 
+<div class="w-full max-w-7xl mx-auto p-4 md:p-6 flex flex-col gap-6">
+  <!-- Chart Section -->
+  <div class="bg-white rounded-xl p-4 shadow-md flex flex-col lg:col-span-2">
+    <form method="get" class="mb-4 flex flex-wrap gap-4 items-center">
+        <input type="hidden" name="tahun_tabel" value="<?= htmlspecialchars($tahunTabel) ?>">
 
+        <div class="flex items-center gap-2">
+            <label for="provinsi" class="font-semibold">Provinsi:</label>
+            <select name="provinsi" id="provinsi" onchange="this.form.submit()" class="p-2 border rounded">
+                <?php foreach ($javaProvinces as $prov): ?>
+                    <option value="<?= htmlspecialchars($prov) ?>" <?= $provinsiDipilih === $prov ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($prov) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-<div>
-  <iframe src="http://localhost:8501/" frameborder="0" class="w-full h-[500px]"></iframe>
-</div>
+        <div class="flex items-center gap-2">
+            <label for="tahun_chart" class="font-semibold">Tahun Chart:</label>
+            <select name="tahun_chart" id="tahun_chart" onchange="this.form.submit()" class="p-2 border rounded">
+                <?php for ($i = 2024; $i >= 2021; $i--): ?>
+                    <option value="<?= $i ?>" <?= $tahunChart == $i ? 'selected' : '' ?>><?= $i ?></option>
+                <?php endfor; ?>
+            </select>
+        </div>
+    </form>
 
-
-<div class="w-full max-w-7xl mx-auto p-4 md:p-6">
-  <form method="get" class="mb-4">
-    <label for="provinsi" class="block mb-2 font-semibold">Pilih Provinsi untuk Chart:</label>
-    <select name="provinsi" id="provinsi" onchange="this.form.submit()" class="p-2 border rounded mb-2">
-      <?php foreach ($javaProvinces as $prov): ?>
-        <option value="<?= htmlspecialchars($prov) ?>" <?= $provinsiDipilih === $prov ? 'selected' : '' ?>>
-          <?= htmlspecialchars($prov) ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
-
-    <label for="bulan" class="block mb-2 font-semibold">Pilih Bulan untuk Chart:</label>
-    <select name="bulan" id="bulan" onchange="this.form.submit()" class="p-2 border rounded">
-      <?php foreach ($bulanOrder as $bln): ?>
-        <option value="<?= htmlspecialchars($bln) ?>" <?= $bulan === $bln ? 'selected' : '' ?>>
-          <?= htmlspecialchars($bln) ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
-  </form>
-
-    <p>Provinsi yang dipilih: <b><?= htmlspecialchars($provinsiDipilih) ?></b></p>
-    <p>Harga rata-rata GKP: Rp <?= $hargaRataGkp ? number_format($hargaRataGkp, 0, ',', '.') : 'Data tidak tersedia' ?></p>
-    <div class="bg-white rounded-xl p-4 shadow-md flex flex-col lg:col-span-2">
-      <p class="text-lg font-semibold mb-2">Harga Padi (Gabah Kering Panen)</p>
-      <div class="relative flex-grow h-[300px]">
+    <p class="text-lg font-semibold mb-2">Harga Padi Setiap Bulan - Tahun <?= htmlspecialchars($tahunChart) ?></p>
+    <div class="relative flex-grow h-[300px]">
         <canvas id="hargaChart"></canvas>
-      </div>
     </div>
-    <div class="bg-white rounded-xl p-4 shadow-md flex flex-col justify-center items-center">
-      <p class="text-sm text-gray-600 mb-1">Harga Rata-rata Padi</p>
-      <p class="text-xl font-bold text-green-700">
-        Rp <?= $hargaRataGkp ? number_format($hargaRataGkp, 0, ',', '.') : 'Data Kosong'; ?>/kg
-      </p>
-      <p class="text-xs text-gray-500">(Bulan <?= $bulan; ?>, <?= date('Y'); ?>)</p>
-    </div>
-    <div class="bg-white rounded-xl p-4 shadow-md lg:col-span-3">
-      <h2 class="text-lg font-semibold text-gray-800 mb-1">Harga Padi Rata-rata Per Provinsi</h2>
-      <p class="text-sm text-gray-500 mb-4">Update: <?= date('d F Y'); ?></p>
+  </div>
+
+  <!-- Average Price Section -->
+  <div class="bg-white rounded-xl p-4 shadow-md flex flex-col justify-center items-center">
+    <p class="text-sm text-gray-600 mb-1">Harga Rata-rata Padi Januari 2024</p>
+    <p class="text-xl font-bold text-green-700">
+      Rp <?= $hargaRataJanuari ? number_format($hargaRataJanuari, 0, ',', '.') : 'Data Kosong'; ?>/kg
+    </p>
+  </div>
+
+ <!-- tabel padi tiap provinsi -->
+  <div class="bg-white rounded-xl p-4 shadow-md lg:col-span-3">
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Harga Padi per Provinsi per Bulan</h2>
+      <form method="get" class="mb-4 flex flex-wrap gap-2 items-center">
+          <input type="hidden" name="provinsi" value="<?= htmlspecialchars($provinsiDipilih) ?>">
+          <input type="hidden" name="tahun_chart" value="<?= htmlspecialchars($tahunChart) ?>">
+
+          <label for="tahun_tabel" class="font-semibold">Pilih Tahun Tabel:</label>
+          <select name="tahun_tabel" id="tahun_tabel" onchange="this.form.submit()" class="p-2 border rounded">
+              <?php for ($i = 2024; $i >= 2021; $i--): ?>
+                  <option value="<?= $i ?>" <?= $tahunTabel == $i ? 'selected' : '' ?>><?= $i ?></option>
+              <?php endfor; ?>
+          </select>
+      </form>                             
+      <!-- <p class="text-sm text-gray-500 mb-4">Update: <?= date('d F Y'); ?></p> -->
       <div class="overflow-x-auto">
         <table class="table-auto w-full text-sm">
           <thead class="bg-gray-100 sticky top-0">
             <tr>
               <th class="px-4 py-2 text-left font-semibold text-gray-600">Provinsi</th>
-              <th class="px-4 py-2 text-left font-semibold text-gray-600">Harga (Rp/kg)</th>
+              <?php foreach ($labels as $bln): ?>
+                <th class="px-4 py-2 text-left font-semibold text-gray-600"><?= $bln ?></th>
+              <?php endforeach; ?>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <?php foreach ($hargaSemuaProvinsi as $item): ?>
+            <?php foreach ($provinsiBulan as $prov => $bulanHarga): ?>
               <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3"><?= htmlspecialchars($item['provinsi']) ?></td>
-                <td class="px-4 py-3 font-medium">Rp <?= number_format($item['harga'], 0, ',', '.') ?></td>
+                <td class="px-4 py-3"><?= htmlspecialchars($prov) ?></td>
+                <?php foreach ($bulanHarga as $harga): ?>
+                  <td class="px-4 py-3 font-medium">
+                    <?= $harga > 0 ? 'Rp ' . number_format($harga, 0, ',', '.') : '-' ?>
+                  </td>
+                <?php endforeach; ?>
               </tr>
             <?php endforeach; ?>
           </tbody>
         </table>
       </div>
-    </div>
-  </div>
-  <div class="mt-6">
-    <a href="../index.php"><button class="w-full bg-green-600 text-white font-semibold shadow-md py-2.5 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">Kembali ke Dashboard</button></a>
   </div>
 </div>
+
+<div class="mt-6">
+  <div class="mt-6 flex justify-center">
+      <a href="../index.php">
+          <button class="bg-green-600 text-white font-semibold shadow-md px-6 py-2.5 rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mb-10">
+              Kembali ke Dashboard
+          </button>
+      </a>
+  </div>
+</div>
+
 <script>
 const ctx = document.getElementById('hargaChart').getContext('2d');
 const hargaChart = new Chart(ctx, {
@@ -171,7 +221,7 @@ const hargaChart = new Chart(ctx, {
     data: {
       labels: <?= json_encode($labels) ?>,
       datasets: [{
-        label: 'Harga GKP Setiap Tiga Bulan',
+        label: 'Harga Padi',
         data: <?= json_encode($dataChart) ?>,
         borderColor: '#ef4444',
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -196,11 +246,16 @@ const hargaChart = new Chart(ctx, {
         tooltip: {
           callbacks: {
             label: function(context) {
-              return 'Harga: Rp ' + context.parsed.y.toLocaleString('id-ID');
+              if (context.parsed.y === 0) {
+                return 'Harga tidak tersedia';
+              } else {
+                return 'Harga: Rp ' + context.parsed.y.toLocaleString('id-ID');
+              }
             }
           }
         }
       },
+      
       scales: {
         x: {
           ticks: { color: '#666', maxRotation: 45, minRotation: 0 }
@@ -209,7 +264,7 @@ const hargaChart = new Chart(ctx, {
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Harga GKP (Rp)',
+            text: 'Harga Padi (Rp)',
             color: '#333',
             font: { size: 12, weight: 'bold' }
           },

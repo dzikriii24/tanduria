@@ -28,7 +28,8 @@ if ($user_id > 0) {
     }
 
     // Notifikasi Panen
-    $res2 = $conn->query("SELECT nama_lahan, mulai_tanam FROM lahan 
+    $res2 = $conn->query("SELECT nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari
+                            FROM lahan 
                           WHERE user_id = $user_id AND DATEDIFF(NOW(), mulai_tanam) >= 120");
     while ($row = $res2->fetch_assoc()) {
         $notif_panen[] = $row;
@@ -118,101 +119,13 @@ if (isset($_POST['hapus_notif_respon'])) {
 
 </head>
 
-<body class="poppins-reguler">
+<body class="poppins-regular">
 
-    <h1 class="text-xl font-bold mb-4">Notifikasi</h1>
-
-    <!-- Respon Konsultasi -->
-    <section class="mb-8">
-        <h2 class="text-lg font-semibold mb-2">Respon Konsultasi</h2>
-        <?php if (empty($notif_respon)): ?>
-            <div class="p-4 bg-white rounded shadow">Belum ada respon konsultasi.</div>
-        <?php else: ?>
-            <?php foreach ($notif_respon as $row): ?>
-                <div class="p-4 bg-white rounded shadow mb-4">
-                    <p class="text-xs text-gray-500"><?= date('d M Y H:i', strtotime($row['waktu_kirim'])) ?></p>
-                    <p class="font-semibold"><?= htmlspecialchars($row['nama_masalah']) ?></p>
-                    <p class="text-sm text-gray-600 mb-2"><?= nl2br(htmlspecialchars($row['detail_masalah'])) ?></p>
-                    <p class="text-green-600 text-sm"><?= nl2br(htmlspecialchars($row['cara_mengatasi'])) ?></p>
-
-                    <?php if (!empty($row['foto']) && file_exists('../uploads/' . $row['foto'])): ?>
-                        <img src="../uploads/<?= htmlspecialchars($row['foto']) ?>" class="mt-2 w-40 rounded shadow">
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </section>
-
-    <!-- Notifikasi Perawatan -->
-    <?php
-    // Ambil data notifikasi dari file PHP sebelumnya (pemupukan, penyemprotan, penyiraman)
-    ?>
-
-    <div class="max-w-xl mx-auto p-4 space-y-6">
-
-        <!-- Notifikasi Pemupukan -->
-        <section class="bg-white rounded-lg shadow p-4">
-            <h2 class="font-semibold text-lg mb-2">Notifikasi Pemupukan</h2>
-            <?php if (!empty($notif_pemupukan)): ?>
-                <?php foreach ($notif_pemupukan as $item): ?>
-                    <div class="border-b py-2">
-                        <p class="font-medium"><?= htmlspecialchars($item['nama_lahan']) ?></p>
-                        <p class="text-sm text-gray-600">Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Pemupukan</p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-sm text-gray-500">Belum ada jadwal pemupukan saat ini.</p>
-            <?php endif; ?>
-        </section>
-
-        <!-- Notifikasi Penyemprotan Pestisida -->
-        <section class="bg-white rounded-lg shadow p-4">
-            <h2 class="font-semibold text-lg mb-2">Notifikasi Penyemprotan Pestisida</h2>
-            <?php if (!empty($notif_penyemprotan)): ?>
-                <?php foreach ($notif_penyemprotan as $item): ?>
-                    <div class="border-b py-2">
-                        <p class="font-medium"><?= htmlspecialchars($item['nama_lahan']) ?></p>
-                        <p class="text-sm text-gray-600">Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Penyemprotan</p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-sm text-gray-500">Belum ada jadwal penyemprotan pestisida saat ini.</p>
-            <?php endif; ?>
-        </section>
-
-        <!-- Notifikasi Penyiraman -->
-        <section class="bg-white rounded-lg shadow p-4">
-            <h2 class="font-semibold text-lg mb-2">Notifikasi Penyiraman</h2>
-            <?php if (!empty($notif_penyiraman)): ?>
-                <?php foreach ($notif_penyiraman as $item): ?>
-                    <div class="border-b py-2">
-                        <p class="font-medium"><?= htmlspecialchars($item['nama_lahan']) ?></p>
-                        <p class="text-sm text-gray-600">Hari ke-<?= $item['hari'] ?> dari tanam — Fase Penyiraman</p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-sm text-gray-500">Belum ada jadwal penyiraman saat ini.</p>
-            <?php endif; ?>
-        </section>
-
+    <div class="navbar bg-[#1D6034] shadow-sm poppins-semibold">
+        <h2 class="text-xl text-white">Notifikasi</h2>
     </div>
+    <!-- Respon Konsultasi -->
 
-
-    <!-- Notifikasi Panen -->
-    <section class="mb-8">
-        <h2 class="text-lg font-semibold mb-2">Lahan Siap Panen</h2>
-        <?php if (empty($notif_panen)): ?>
-            <div class="p-4 bg-white rounded shadow">Belum ada lahan siap panen.</div>
-        <?php else: ?>
-            <?php foreach ($notif_panen as $row): ?>
-                <div class="p-4 bg-white rounded shadow mb-2">
-                    <p class="font-semibold"><?= htmlspecialchars($row['nama_lahan']) ?></p>
-                    <p class="text-sm">Sudah lebih dari 120 hari sejak tanam.</p>
-                    <p class="text-xs text-gray-500">Mulai tanam: <?= date('d M Y', strtotime($row['mulai_tanam'])) ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </section>
 
 
 
@@ -224,19 +137,18 @@ if (isset($_POST['hapus_notif_respon'])) {
 
 
     <!-- Notifikasi FIXXXX -->
-    <div class="mx-auto px-4">
+    <div class="mx-auto px-4 mt-4">
         <div class="space-y-4">
-
-            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer mb-40" open>
-                <summary class="flex items-center justify-between gap-1.5 bg-base-100 p-4 text-gray-900 rounded-lg relative">
+            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer rounded-lg" open>
+                <summary class="flex items-center justify-between gap-1.5 bg-[#1D6034] p-4 rounded-lg relative">
                     <?php if (!empty($notif_respon)): ?>
                         <span class="indicator absolute -top-2 -right-2">
-                            <span class="indicator-item badge badge-secondary"><?= count($notif_respon) ?></span>
+                            <span class="indicator-item badge badge-[#ffff] text-[#1D6034]"><?= count($notif_respon) ?></span>
                         </span>
                     <?php endif; ?>
-                    <h2 class="text-lg font-medium">Response Konsultasi</h2>
+                    <h2 class="text-lg poppins-semibold text-white">Response Konsultasi</h2>
 
-                    <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    <svg class="size-5 text-white shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -244,12 +156,12 @@ if (isset($_POST['hapus_notif_respon'])) {
                 </summary>
 
                 <?php if (empty($notif_respon)): ?>
-                    <div class="p-4 bg-white rounded shadow">Belum ada respon konsultasi.</div>
+                    <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada respon konsultasi.</div>
                 <?php else: ?>
                     <?php foreach ($notif_respon as $row): ?>
-                        <ul class="list bg-base-100 shadow-md rounded-b-lg -mt-2">
-                            <li class="list-row">
-                                <div>
+                        <ul class="list bg-[#2C8F53] shadow-md rounded-b-lg -mt-3 pt-3">
+                            <li class="list-row text-white poppins-reguler">
+                                <div class="">
                                     <?php if (!empty($row['foto']) && file_exists('../uploads/' . $row['foto'])): ?>
                                         <img src="../uploads/<?= htmlspecialchars($row['foto']) ?>" class="size-10 rounded-box">
                                     <?php endif; ?>
@@ -280,8 +192,203 @@ if (isset($_POST['hapus_notif_respon'])) {
                 <?php endif; ?>
 
             </details>
+
+            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer" open>
+                <summary class="flex items-center justify-between gap-1.5 bg-[#1D6034] p-4 text-white rounded-lg relative">
+                    <?php if (!empty($notif_panen)): ?>
+                        <span class="indicator absolute -top-2 -right-2">
+                            <span class="indicator-item badge badge-white"><?= count($notif_panen) ?></span>
+                        </span>
+                    <?php endif; ?>
+                    <h2 class="text-lg font-medium">Lahan Panen</h2>
+
+                    <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                </summary>
+
+                <?php if (empty($notif_panen)): ?>
+                   
+                    <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada lahan siap panen.</div>
+                <?php else: ?>
+                    <?php foreach ($notif_panen as $row): ?>
+                        <ul class="list shadow-md rounded-b-lg -mt-3 text-white bg-[#2C8F53] pt-3">
+                            <li class="list-row">
+                                <div>
+                                    <i class="fi fi-ss-shovel text-xl"></i>
+                                </div>
+                                <div>
+                                    <div><?= htmlspecialchars($row['nama_lahan']) ?></div>
+                                    <div class="text-xs font-reguler opacity-80"><?= nl2br(htmlspecialchars($row['hari'])) ?></div>
+                                </div>
+                                <p class="list-col-wrap text-xs">
+                                    Hari ke-<?= $row['hari'] ?> dari tanam — Waktu Panen
+                                </p>
+                                <p class="list-col-wrap text-xs">
+                                    Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
+                                </p>
+
+
+                            </li>
+                        </ul>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+            </details>
+
+            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer" open>
+                <summary class="flex items-center justify-between gap-1.5 bg-[#1D6034] p-4 text-white rounded-lg relative">
+                    <?php if (!empty($notif_pemupukan)): ?>
+                        <span class="indicator absolute -top-2 -right-2">
+                            <span class="indicator-item badge badge-white"><?= count($notif_pemupukan) ?></span>
+                        </span>
+                    <?php endif; ?>
+                    <h2 class="text-lg font-medium">Jadwal Pemupukan Lahan</h2>
+
+                    <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                </summary>
+                <?php if (empty($notif_pemupukan)): ?>
+                    
+                    <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal pemupukan saat ini.</div>
+                    
+                <?php else: ?>
+                    <?php foreach ($notif_pemupukan as $item): ?>
+                        <ul class="list bg-[#2C8F53] shadow-md rounded-b-lg -mt-3 text-white pt-3">
+
+                            <li class="list-row">
+                                <div>
+                                    <i class="fi fi-sr-bag-seedling text-xl"></i>
+                                </div>
+
+                                <div>
+                                    <div><?= htmlspecialchars($item['nama_lahan']) ?></div>
+
+                                </div>
+                                <p class="list-col-wrap text-xs">
+                                    Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Pemupukan
+                                </p>
+                              <p class="list-col-wrap text-xs">
+                                    Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
+                                </p>
+
+
+                            </li>
+                        </ul>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+            </details>
+
+
+            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer" open>
+                <summary class="flex items-center justify-between gap-1.5 bg-[#1D6034] p-4 text-white rounded-lg relative">
+                    <?php if (!empty($notif_penyiraman)): ?>
+                        <span class="indicator absolute -top-2 -right-2">
+                            <span class="indicator-item badge badge-white"><?= count($notif_penyiraman) ?></span>
+                        </span>
+                    <?php endif; ?>
+                    <h2 class="text-lg font-medium">Jadwal Penyiraman Lahan</h2>
+
+                    <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                </summary>
+
+                <?php if (empty($notif_penyiraman)): ?>
+                 
+                    <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal penyiraman saat ini.</div>
+                <?php else: ?>
+                    <?php foreach ($notif_penyiraman as $item): ?>
+                        <ul class="list bg-[#2C8F53] text-white shadow-md rounded-b-lg -mt-3 pt-3">
+                            <li class="list-row">
+                                <div>
+                                    <i class="fi fi-sr-water text-xl"></i>
+                                </div>
+                                <div>
+                                    <div><?= htmlspecialchars($item['nama_lahan']) ?></div>
+
+                                </div>
+                                <p class="list-col-wrap text-xs">
+                                    Hari ke-<?= $item['hari'] ?> dari tanam — Fase Penyiraman
+                                </p>
+                           <p class="list-col-wrap text-xs">
+                                    Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
+                                </p>
+
+
+
+
+                            </li>
+                        </ul>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+            </details>
+
+
+
+
+            <details class="group [&_summary::-webkit-details-marker]:hidden cursor-pointer mb-30" open>
+                <summary class="flex items-center justify-between gap-1.5 bg-[#1D6034] p-4 text-white rounded-lg relative">
+                    <?php if (!empty($notif_penyemprotan)): ?>
+                        <span class="indicator absolute -top-2 -right-2">
+                            <span class="indicator-item badge badge-white"><?= count($notif_penyemprotan) ?></span>
+                        </span>
+                    <?php endif; ?>
+                    <h2 class="text-lg font-medium">Penyemprotan Pestisida</h2>
+
+                    <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                </summary>
+
+                <?php if (empty($notif_penyemprotan)): ?>
+                    <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal penyemprotan pestisida saat ini.</div>
+                
+                <?php else: ?>
+                    <?php foreach ($notif_penyemprotan as $item): ?>
+                        <ul class="list bg-[#2C8F53] text-white shadow-md rounded-b-lg -mt-3 pt-3">
+                            <li class="list-row">
+                                <div>
+                                    <i class="fi fi-sr-mosquito-net text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium"><?= htmlspecialchars($item['nama_lahan']) ?></p>
+
+                                </div>
+                                <p class="list-col-wrap text-xs">
+                                    Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Penyemprotan
+                                </p>
+                            <p class="list-col-wrap text-xs">
+                                    Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
+                                </p>
+
+                            </li>
+                        </ul>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+            </details>
         </div>
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -307,13 +414,13 @@ if (isset($_POST['hapus_notif_respon'])) {
         <div class="grid grid-cols-5 text-center text-xs text-[#4E4E4E]">
 
             <!-- Dashboard -->
-            <a href="index.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
+            <a href="../index.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <i class="fi fi-sr-home text-lg"></i>
                 <span>Dashboard</span>
             </a>
 
             <!-- Notifikasi -->
-            <a href="php/notifikasi.php" class="group flex flex-col items-center justify-center py-2 relative hover:text-[#1D6034] transition-all">
+            <a href="notifikasi.php" class="group flex flex-col items-center justify-center py-2 relative hover:text-[#1D6034] transition-all">
                 <div class="relative">
                     <i class="fi fi-ss-bell text-lg text-[#1D6034]"></i>
                     <span id="notif-badge" class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1 text-[10px] hidden">0</span>
@@ -322,7 +429,7 @@ if (isset($_POST['hapus_notif_respon'])) {
             </a>
 
             <!-- Lahan -->
-            <a href="php/lahan.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
+            <a href="lahan.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
                     <i class="fi fi-sr-land-layers text-xl"></i>
                 </div>
@@ -330,13 +437,13 @@ if (isset($_POST['hapus_notif_respon'])) {
             </a>
 
             <!-- Edukasi -->
-            <a href="php/edukasi.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
+            <a href="edukasi.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <i class="fi fi-ss-book-open-cover text-lg"></i>
                 <span>Edukasi</span>
             </a>
 
             <!-- Profil -->
-            <a href="php/profile.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
+            <a href="profile.php" class="group flex flex-col items-center justify-center py-2 hover:text-[#1D6034] transition-all">
                 <i class="fi fi-sr-user text-lg"></i>
                 <span>Profil</span>
             </a>

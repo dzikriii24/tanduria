@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </head>
 
-<body class="poppins-reguler">
+<body class="poppins-regular">
 
     <!-- perkiraan cuaca -->
     <div class="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 px-2 mx-auto mt-2 text-white">
@@ -403,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 </a>
-                <a href="php/Perencanaan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
+                <a href="php/perencanaan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
                             <img
