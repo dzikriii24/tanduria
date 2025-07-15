@@ -256,8 +256,8 @@ if ($lat && $lng) {
   <?php if (isset($_SESSION['login_success'])): ?>
     <script>
       Swal.fire({
-        title: 'Berhasil Login!',
-        text: 'Selamat datang kembali!',
+        title: 'Berhasil Login',
+        text: 'Selamat datang!',
         icon: 'success',
         showConfirmButton: false,
         timer: 1500
