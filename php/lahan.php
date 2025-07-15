@@ -194,17 +194,14 @@ $conn->close();
 
       </label>
       <a href="#" id="tambahLahanBtn"
-        onclick="handleTambahLahanClick(event)"
-        class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#B03C3C] hover:to-[#B03C3C] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
-        <svg id="spinnerIcon" class="hidden w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-        </svg>
-        <svg id="plusIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-      </a>
+  onclick="handleTambahLahanClick(event)"
+  class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#B03C3C] hover:to-[#B03C3C] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+  <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+  </svg>
+</a>
+
     </div>
   </div>
   <div class="px-4">
@@ -331,26 +328,26 @@ $conn->close();
   <script src="../javascript/lahan.js"></script>
   <script src="../javascript/other.js"></script>
   <script>
-    function handleTambahLahanClick(event) {
-      event.preventDefault();
+  function handleTambahLahanClick(event) {
+    event.preventDefault();
 
-      const button = document.getElementById("tambahLahanBtn");
-      const ripple = document.getElementById("rippleEffect");
-      const spinner = document.getElementById("spinnerIcon");
-      const plusIcon = document.getElementById("plusIcon");
+    const button = document.getElementById("tambahLahanBtn");
+    const ripple = document.getElementById("rippleEffect");
 
-      button.disabled = true;
-      spinner.classList.remove("hidden");
-      plusIcon.classList.add("hidden");
+    // Nonaktifkan tombol sementara (opsional)
+    button.disabled = true;
 
-      ripple.classList.remove("opacity-0");
-      ripple.classList.add("opacity-20");
+    // Tampilkan efek ripple putih (opsional)
+    ripple.classList.remove("opacity-0");
+    ripple.classList.add("opacity-20");
 
-      setTimeout(() => {
-        window.location.href = "formLahan.php";
-      }, 200);
-    }
-  </script>
+    // Redirect ke halaman form setelah efek sebentar
+    setTimeout(() => {
+      window.location.href = "formLahan.php";
+    }, 200);
+  }
+</script>
+
 
 </body>
 </html>
