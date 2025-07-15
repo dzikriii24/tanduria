@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tambah Lahan - Tanduria</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
 
   <div class="max-w-4xl mx-auto px-4 py-8">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Tambah Lahan</h2>
     <?php if (isset($_GET['error']) && $_GET['error'] === 'invalid_maps'): ?>
-  <script>
-    Swal.fire({
-      icon: 'error',
-      title: 'Gagal Ambil Koordinat',
-      text: 'Link Google Maps tidak valid atau tidak dapat dikonversi ke koordinat.',
-      confirmButtonColor: '#d33'
-    });
-  </script>
-<?php endif; ?>
+      <script>
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal Ambil Koordinat',
+          text: 'Link Google Maps tidak valid atau tidak dapat dikonversi ke koordinat.',
+          confirmButtonColor: '#d33'
+        });
+      </script>
+    <?php endif; ?>
     <form id="formLahan" action="lahan.php" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)" class="bg-white p-6 rounded-2xl shadow-md space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Nama -->
@@ -66,7 +68,7 @@
             <div class="flex flex-col items-center justify-center pt-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                  d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
               </svg>
               <p class="text-sm text-gray-500">Klik untuk unggah foto</p>
             </div>
@@ -84,20 +86,29 @@
           <textarea id="deskripsiLahan" name="deskripsiLahan" rows="3" class="w-full rounded-xl border px-4 py-2 text-sm resize-none focus:ring-green-500 focus:outline-none"></textarea>
         </div>
 
- <!-- Link Maps -->
-<div class="md:col-span-2">
-  <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
-  
-  <div class="flex flex-col space-y-2">
-    <input type="url" id="linkMaps" name="linkMaps" placeholder="https://www.google.com/maps/place/" class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
-    <div class="flex items-center space-x-2">
-      <a href="https://www.google.com/maps" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
-        🌍 Buka Google Maps
-      </a>
-      <span class="text-xs text-gray-500">Klik dan salin link </span>
-    </div>
-  </div>
-</div>
+        <!-- Link Maps -->
+        <div class="md:col-span-2">
+          <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
+
+          <div class="flex flex-col space-y-2">
+            <input type="url" id="linkMaps" name="linkMaps" placeholder="https://www.google.com/maps/place/" class="w-full rounded-xl border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
+            <div class="flex items-center space-x-2">
+              <a href="https://www.google.com/maps" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
+                🌍 Buka Google Maps
+              </a>
+              <span class="text-xs text-gray-500">Klik dan salin link </span>
+              
+
+            </div>
+            <p class="text-sm text-gray-600 mt-4">
+                ✨ Cara Ambil Link Lokasi:
+                <br>- Buka Google Maps lewat tombol di atas.
+                <br>- Cari dan klik lokasi Anda.
+                <br>- Copy link dari address bar browser, bukan dari tombol Share.
+                <br>- Contoh format: <code>https://www.google.com/maps/place/.../@-6.175110,106.865036</code>
+              </p>
+          </div>
+        </div>
 
         <!-- Pestisida -->
         <div>
@@ -171,7 +182,7 @@
     }
 
     // Ambil koordinat otomatis dari link maps
-    document.getElementById('linkMaps').addEventListener('input', function () {
+    document.getElementById('linkMaps').addEventListener('input', function() {
       const link = this.value;
       const latField = document.getElementById('koordinatLat');
       const lngField = document.getElementById('koordinatLng');
@@ -197,14 +208,25 @@
       });
 
       if (pesan !== "") {
-        Swal.fire({ icon: 'error', title: 'Data Belum Lengkap', text: "Mohon isi:\n" + pesan, confirmButtonColor: '#d33' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Data Belum Lengkap',
+          text: "Mohon isi:\n" + pesan,
+          confirmButtonColor: '#d33'
+        });
         return false;
       }
 
       const inputDate = new Date(document.getElementById('mulaiTanam').value);
-      const today = new Date(); today.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       if (inputDate < today) {
-        Swal.fire({ icon: 'error', title: 'Tanggal Tanam Tidak Valid', text: 'Minimal hari ini.', confirmButtonColor: '#d33' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Tanggal Tanam Tidak Valid',
+          text: 'Minimal hari ini.',
+          confirmButtonColor: '#d33'
+        });
         return false;
       }
 
@@ -235,4 +257,5 @@
   </script>
 
 </body>
+
 </html>

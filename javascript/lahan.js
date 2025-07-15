@@ -65,6 +65,7 @@ function fetchAllLahan() {
                                     class="h-60 mx-auto w-[430px] object-cover sm:h-60 lg:h-96 rounded-lg"
                                 />
                             </button>
+                            
 
                             <dialog id="foto" class="modal">
                                 <div class="modal-box w-auto max-w-[400px] p-0 overflow-hidden">

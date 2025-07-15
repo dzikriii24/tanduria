@@ -11,13 +11,75 @@ if ($conn->connect_error) {
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
-  die("Anda belum login.");
+?>
+  <!DOCTYPE html>
+  <html lang="id">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/icon.css">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <title>Tanduria</title>
+  <style type="text/tailwind">
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/hover.css">
+  <link rel="stylesheet" href="../css/icon.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  </head>
+
+  <body>
+    <section class="bg-white lg:grid lg:h-screen lg:place-content-center">
+      <div class="mx-auto w-screen max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+        <div class="mx-auto max-w-prose text-center">
+          <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl">
+            Anda Belum Login!
+            <strong class="text-indigo-600">Silakan Login Terlebih Dahulu</strong>
+          </h1>
+
+          <p class="mt-4 text-base text-pretty text-gray-700 sm:text-lg/relaxed">
+            Halaman ini hanya bisa diakses jika Anda sudah login.
+          </p>
+
+          <div class="mt-4 flex justify-center gap-4 sm:mt-6">
+            <a
+              class="inline-block rounded border border-indigo-600 bg-indigo-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+              href="login.php">
+              Login Sekarang
+            </a>
+
+            <a
+              class="inline-block rounded border border-gray-200 px-5 py-3 font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 hover:text-gray-900"
+              href="../">
+              Kembali ke Beranda
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+
+  </html>
+<?php
+  exit;
 }
+
+
 $user_id = $_SESSION['user_id'];
 
 
 // 🔁 Fungsi untuk resolve link pendek dan ambil koordinat
-function getRedirectLocation($url) {
+function getRedirectLocation($url)
+{
   $ch = curl_init($url);
   curl_setopt($ch, CURLOPT_HEADER, true);
   curl_setopt($ch, CURLOPT_NOBODY, true);
@@ -33,7 +95,8 @@ function getRedirectLocation($url) {
   return null;
 }
 
-function extractCoordinates($url) {
+function extractCoordinates($url)
+{
   if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
     return ['lat' => $matches[1], 'lng' => $matches[2]];
   }
@@ -91,14 +154,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       user_id, nama_lahan, luas_lahan, tempat_lahan, jenis_padi, mulai_tanam,
       foto_lahan, deskripsi, link_maps, pestisida, modal_tanam, koordinat_lat, koordinat_lng
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    
+
     $stmt->bind_param(
       "isisssssssidd",
-      $user_id, $nama, $luas, $tempat, $jenis, $tanam,
-      $newFileName, $deskripsi, $maps, $pestisida, $modal,
-      $lat, $lng
+      $user_id,
+      $nama,
+      $luas,
+      $tempat,
+      $jenis,
+      $tanam,
+      $newFileName,
+      $deskripsi,
+      $maps,
+      $pestisida,
+      $modal,
+      $lat,
+      $lng
     );
-    
+
     if ($stmt->execute()) {
       header("Location: lahan.php?success=1");
       exit;
@@ -254,7 +327,7 @@ $conn->close();
                 <dd class="text-sm text-white nama_lahan"><?= htmlspecialchars($lahan['tempat_lahan']) ?></dd>
               </div>
 
-              <div >
+              <div>
                 <dt class="sr-only">Nama Lahan</dt>
 
                 <dd class="font-semibold text-lg nama_lahan text-white"><?= htmlspecialchars($lahan['nama_lahan']) ?></dd>
@@ -353,4 +426,5 @@ $conn->close();
   </script>
 
 </body>
+
 </html>

@@ -19,8 +19,10 @@ $result = $stmt->get_result();
 $data = [];
 
 while ($row = $result->fetch_assoc()) {
+    $row['foto_lahan'] = $row['foto_lahan'] ? 'uploads/' . $row['foto_lahan'] : null;
     $data[] = $row;
 }
+
 
 echo json_encode($data);
 ?>
