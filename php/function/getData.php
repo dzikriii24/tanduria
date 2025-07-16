@@ -11,7 +11,7 @@ if (!$user_id) {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, nama_lahan, koordinat_lat, koordinat_lng, mulai_tanam, foto_lahan, link_maps FROM lahan WHERE user_id = ?");
+$stmt = $conn->prepare("SELECT id, nama_lahan, koordinat_lat, koordinat_lng, mulai_tanam, foto_lahan, link_maps FROM lahan WHERE user_id = ? AND status = 'aktif'");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 

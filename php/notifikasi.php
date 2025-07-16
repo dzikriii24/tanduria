@@ -28,25 +28,28 @@ if ($user_id > 0) {
     }
 
     // Notifikasi Panen
-    $res2 = $conn->query("SELECT nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari
+    $res2 = $conn->query("SELECT status, nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari
                             FROM lahan 
-                          WHERE user_id = $user_id AND DATEDIFF(NOW(), mulai_tanam) >= 120");
+                          WHERE user_id = $user_id
+                           AND DATEDIFF(NOW(), mulai_tanam) >= 120");
     while ($row = $res2->fetch_assoc()) {
         $notif_panen[] = $row;
     }
 
-    $pemupukan = $conn->query("SELECT nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
+    $pemupukan = $conn->query("SELECT status, nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
                                 FROM lahan 
                                 WHERE user_id = $user_id 
+                                AND status = 'aktif'
                                 AND DATEDIFF(NOW(), mulai_tanam) IN (7, 25, 45)");
     while ($row = $pemupukan->fetch_assoc()) {
         $notif_pemupukan[] = $row;
     }
 
     // Penyemprotan Pestisida
-    $pestisida = $conn->query("SELECT nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
+    $pestisida = $conn->query("SELECT status, nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
                             FROM lahan 
                             WHERE user_id = $user_id 
+                            AND status = 'aktif'
                             AND (
                                 (DATEDIFF(NOW(), mulai_tanam) BETWEEN 20 AND 30) OR
                                 (DATEDIFF(NOW(), mulai_tanam) BETWEEN 35 AND 50) OR
@@ -60,9 +63,10 @@ if ($user_id > 0) {
 
 
     // Penyiraman → dibuat manual dari rentang hari berdasarkan fase
-    $penyiraman = $conn->query("SELECT nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
+    $penyiraman = $conn->query("SELECT status, nama_lahan, mulai_tanam, DATEDIFF(NOW(), mulai_tanam) AS hari 
                                  FROM lahan 
                                  WHERE user_id = $user_id 
+                                 AND status = 'aktif'
                                  AND DATEDIFF(NOW(), mulai_tanam) BETWEEN 0 AND 80");
     while ($row = $penyiraman->fetch_assoc()) {
         $hari = (int)$row['hari'];
@@ -96,7 +100,7 @@ if (isset($_POST['hapus_notif_respon'])) {
 
 
 <!DOCTYPE html>
-<html lang="en" class="bg-[#F5F2EB] overflow-x-hidden">
+<html lang="en" class="bg-[#ffff] overflow-x-hidden">
 
 <head>
     <meta charset="UTF-8">
@@ -107,7 +111,8 @@ if (isset($_POST['hapus_notif_respon'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Tanduria</title>
+    <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+    <title>Notifikasi</title>
     <style type="text/tailwind">
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,18 +126,10 @@ if (isset($_POST['hapus_notif_respon'])) {
 
 <body class="poppins-regular">
 
-    <div class="navbar bg-[#1D6034] shadow-sm poppins-semibold">
-        <h2 class="text-xl text-white">Notifikasi</h2>
+    <div class="navbar bg-[#ffff] shadow-sm poppins-semibold">
+        <h2 class="text-xl text-[#4E4E4E]">Notifikasi</h2>
     </div>
     <!-- Respon Konsultasi -->
-
-
-
-
-
-
-
-
 
 
 
@@ -210,7 +207,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                 </summary>
 
                 <?php if (empty($notif_panen)): ?>
-                   
+
                     <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada lahan siap panen.</div>
                 <?php else: ?>
                     <?php foreach ($notif_panen as $row): ?>
@@ -254,9 +251,9 @@ if (isset($_POST['hapus_notif_respon'])) {
                 </summary>
                 </summary>
                 <?php if (empty($notif_pemupukan)): ?>
-                    
+
                     <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal pemupukan saat ini.</div>
-                    
+
                 <?php else: ?>
                     <?php foreach ($notif_pemupukan as $item): ?>
                         <ul class="list bg-[#2C8F53] shadow-md rounded-b-lg -mt-3 text-white pt-3">
@@ -273,7 +270,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                                 <p class="list-col-wrap text-xs">
                                     Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Pemupukan
                                 </p>
-                              <p class="list-col-wrap text-xs">
+                                <p class="list-col-wrap text-xs">
                                     Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
                                 </p>
 
@@ -303,7 +300,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                 </summary>
 
                 <?php if (empty($notif_penyiraman)): ?>
-                 
+
                     <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal penyiraman saat ini.</div>
                 <?php else: ?>
                     <?php foreach ($notif_penyiraman as $item): ?>
@@ -319,7 +316,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                                 <p class="list-col-wrap text-xs">
                                     Hari ke-<?= $item['hari'] ?> dari tanam — Fase Penyiraman
                                 </p>
-                           <p class="list-col-wrap text-xs">
+                                <p class="list-col-wrap text-xs">
                                     Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
                                 </p>
 
@@ -354,7 +351,7 @@ if (isset($_POST['hapus_notif_respon'])) {
 
                 <?php if (empty($notif_penyemprotan)): ?>
                     <div class="p-4 bg-[#2C8F53] rounded shadow text-white -mt-3">Belum ada jadwal penyemprotan pestisida saat ini.</div>
-                
+
                 <?php else: ?>
                     <?php foreach ($notif_penyemprotan as $item): ?>
                         <ul class="list bg-[#2C8F53] text-white shadow-md rounded-b-lg -mt-3 pt-3">
@@ -369,7 +366,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                                 <p class="list-col-wrap text-xs">
                                     Hari ke-<?= $item['hari'] ?> dari tanam — Waktu Penyemprotan
                                 </p>
-                            <p class="list-col-wrap text-xs">
+                                <p class="list-col-wrap text-xs">
                                     Mulai Tanam <br><?= date('d M Y H:i', strtotime($row['mulai_tanam'])) ?>
                                 </p>
 
@@ -381,33 +378,6 @@ if (isset($_POST['hapus_notif_respon'])) {
             </details>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <!-- Bottom Navigation Dock -->
     <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md rounded-3xl shadow-lg bg-white border border-white">
@@ -458,7 +428,7 @@ if (isset($_POST['hapus_notif_respon'])) {
                 .then(data => {
                     const badge = document.getElementById("notif-badge");
                     if (data.total > 0) {
-                        badge.innerText = data.total > 9 ? "9+" : data.total;
+                        badge.innerText = "•";
                         badge.style.display = "inline";
                     } else {
                         badge.style.display = "none";

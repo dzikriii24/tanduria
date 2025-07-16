@@ -3,7 +3,7 @@ fetch('php/chart.php')
     .then(data => {
         console.log(data); // pastikan datanya sudah masuk
 
-        const categories = data.map(lahan => `${lahan.nama_lahan}\n${lahan.tanggalTanam}`);
+        const categories = data.map(lahan => `${lahan.nama_lahan}`);
         const hariValues = data.map(lahan => lahan.hariKe);
 
         const options = {
@@ -49,6 +49,7 @@ fetch('php/chart.php')
             yaxis: {
                 title: {
                     text: 'Hari ke-'
+                    
                 },
                 min: 0,
                 max: 130
@@ -71,7 +72,7 @@ fetch('php/chart.php')
                     }
                 }]
             },
-            colors: ['#B03C3C']
+            colors: ['#2C8F53']
         };
 
         const chart = new ApexCharts(document.querySelector("#lahanChartApex"), options);

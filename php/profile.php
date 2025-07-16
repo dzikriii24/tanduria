@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'db.php';
+require 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: login.php");
@@ -13,8 +14,8 @@ $lng = null;
 
 
 // Ambil data user yang login
-$id_user = $_SESSION['user_id'];
-$query = mysqli_query($conn, "SELECT * FROM user WHERE id = $id_user");
+$user_id = $_SESSION['user_id'];
+$query = mysqli_query($conn, "SELECT * FROM user WHERE id = $user_id");
 $user = mysqli_fetch_assoc($query);
 
 
@@ -23,31 +24,33 @@ $totalLahan = 0;
 $totalHektar = 0;
 $jumlahPanen = 0;
 
-if ($id_user) {
-  $stmt = $conn->prepare("SELECT luas_lahan, mulai_tanam FROM lahan WHERE user_id = ?");
-  $stmt->bind_param("i", $id_user);
+if ($user_id) {
+  $stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ?");
+  $stmt->bind_param("i", $user_id);
   $stmt->execute();
   $result = $stmt->get_result();
 
   while ($row = $result->fetch_assoc()) {
-    $totalLahan++;
-    $totalHektar += (int)$row['luas_lahan'];
+    if ($row['status'] == 'aktif') {
+      $totalLahan++;
+      $totalHektar += $row['luas_lahan'] / 10000;
+    }
 
     if (!empty($row['mulai_tanam'])) {
       $mulaiTanam = new DateTime($row['mulai_tanam']);
       $hariIni = new DateTime();
       $selisihHari = $mulaiTanam->diff($hariIni)->days;
 
-      if ($selisihHari >= 120) {
+      if ($selisihHari >= 120 || $row['status'] == 'selesai') {
         $jumlahPanen++;
       }
     }
   }
 }
 
-if ($id_user) {
+if ($user_id) {
   $stmt = $conn->prepare("SELECT lat, lng FROM user WHERE id = ?");
-  $stmt->bind_param("i", $id_user);
+  $stmt->bind_param("i", $user_id);
   $stmt->execute();
   $result = $stmt->get_result();
   if ($row = $result->fetch_assoc()) {
@@ -78,7 +81,7 @@ if ($lat && $lng) {
 
 
 <!DOCTYPE html>
-<html lang="id" class="#F5F2EB">
+<html lang="id" class="#ffff">
 
 <head>
   <meta charset="UTF-8">
@@ -89,7 +92,8 @@ if ($lat && $lng) {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <title>Tanduria</title>
+  <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+  <title>Profile &nbsp;<?= htmlspecialchars($user['nama']) ?></title>
   <style type="text/tailwind">
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,8 +105,8 @@ if ($lat && $lng) {
 
 </head>
 
-<body class="poppins-reguler">
-  <div class="navbar shadow-sm bg-[#1D6034] text-white">
+<body class="poppins-regular">
+  <div class="navbar shadow-sm bg-[#ffff] text-[#4E4E4E]">
     <p class="text-xl font-semibold">Profil Anda</p>
   </div>
 
@@ -139,7 +143,7 @@ if ($lat && $lng) {
           </div>
           <div class="collapse-content text-sm text-[#4E4E4E]"><?= htmlspecialchars($lokasi_nama) ?></div>
           <div class="mt-2 text-sm">
-            <a href="update_profile.php" class="btn btn-active btn-primary btn-sm">Edit Profile</a>
+            <a href="update_profile.php" class="btn bg-[#1D6034] btn-sm">Edit Profile</a>
           </div>
 
         </div>
@@ -148,7 +152,7 @@ if ($lat && $lng) {
 
 
       <!-- Stat -->
-      <div class="stats shadow mt-6 sm:mt-4 w-[42 0px] sm:w-[50%] mb-4">
+      <div class="stats shadow mt-6 sm:mt-4 w-[420px] sm:w-[50%] mb-4">
         <div class="stat bg-[#A3CC5A] text-white">
           <div class="stat-figure">
             <i class="fi fi-sr-layer-plus text-xl sm:text-3xl"></i>
@@ -223,14 +227,17 @@ if ($lat && $lng) {
           <span class="">Dashboard</span>
         </a>
 
-        <!-- Bookmark -->
-        <a href="notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-          <i class="fi fi-ss-bell text-lg"></i>
+        <!-- Notifikasi -->
+        <a href="notifikasi.php" class="group flex flex-col items-center justify-center py-2 relative hover:text-[#1D6034] transition-all">
+          <div class="relative">
+            <i class="fi fi-ss-bell text-lg"></i>
+            <span id="notif-badge" class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1 text-[10px] hidden">0</span>
+          </div>
           <span>Notifikasi</span>
         </a>
 
         <!-- Post -->
-        <a href="" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+        <a href="lahan.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
           <div class="w-10 h-10 rounded-full bg-[#1D6034] text-white flex items-center justify-center shadow-lg">
             <i class="fi fi-sr-land-layers text-xl"></i>
           </div>
@@ -265,6 +272,25 @@ if ($lat && $lng) {
     </script>
     <?php unset($_SESSION['login_success']); ?>
   <?php endif; ?>
+
+  <script>
+    function cekNotifBadge() {
+      fetch("function/getNotif.php")
+        .then(res => res.json())
+        .then(data => {
+          const badge = document.getElementById("notif-badge");
+          if (data.total > 0) {
+            badge.innerText = "•";
+            badge.style.display = "inline";
+          } else {
+            badge.style.display = "none";
+          }
+        });
+    }
+
+    setInterval(cekNotifBadge, 10000);
+    cekNotifBadge();
+  </script>
 
   <script src="../javascript/other.js"></script>
 </body>

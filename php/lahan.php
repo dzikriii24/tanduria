@@ -16,25 +16,25 @@ if (!isset($_SESSION['user_id'])) {
   <html lang="id">
 
   <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="css/icon.css">
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <title>Tanduria</title>
-  <style type="text/tailwind">
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/font.css">
-  <link rel="stylesheet" href="../css/hover.css">
-  <link rel="stylesheet" href="../css/icon.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="css/icon.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <title>Tanduria</title>
+    <style type="text/tailwind">
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/hover.css">
+    <link rel="stylesheet" href="../css/icon.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   </head>
 
   <body>
@@ -187,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 // 🔄 Ambil semua data lahan user
-$stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? ORDER BY id DESC");
+$stmt = $conn->prepare("SELECT * FROM lahan WHERE user_id = ? AND status = 'aktif' ORDER BY id DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -203,7 +203,7 @@ $conn->close();
 
 
 <!DOCTYPE html>
-<html lang="id" class="bg-[#F5F2EB] overflow-x-hidden">
+<html lang="id" class="bg-[#ffff] overflow-x-hidden">
 
 <head>
   <meta charset="UTF-8">
@@ -213,7 +213,8 @@ $conn->close();
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <title>Tanduria</title>
+  <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+  <title>Lahan</title>
   <style type="text/tailwind">
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -227,7 +228,7 @@ $conn->close();
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
-<body class="poppins-reguler">
+<body class="poppins-regular">
 
   <?php if (isset($_GET['success'])): ?>
     <script>
@@ -244,9 +245,9 @@ $conn->close();
       }
     </script>
   <?php endif; ?>
-  <div class="navbar text-white bg-[#1D6034] shadow-sm">
+  <div class="navbar text-white bg-[#ffff] shadow-sm">
     <div class="flex-1">
-      <p class="poppins-semibold text-xl">Daftar Lahan</p>
+      <p class="poppins-semibold text-xl text-[#4E4E4E]">Daftar Lahan</p>
     </div>
     <div class="flex gap-2">
       <label class="mt-1 poppins-regular bg-[#FFFFFF] aret-[#1F2937] text-[#1F2937] input items-center -mt-5 flex justify-self-center outline-none rounded-xl hover:outline-hidden focus:outline-hidden lg:w-[500px]" style="outline:none;">
@@ -267,13 +268,13 @@ $conn->close();
 
       </label>
       <a href="#" id="tambahLahanBtn"
-  onclick="handleTambahLahanClick(event)"
-  class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#B03C3C] hover:to-[#B03C3C] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-  <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
-  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-  </svg>
-</a>
+        onclick="handleTambahLahanClick(event)"
+        class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#1D6034] hover:to-[#1D6034] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </a>
 
     </div>
   </div>
@@ -289,13 +290,13 @@ $conn->close();
         </div>
 
         <!-- Map -->
-        <div id="map" class="h-[500px] w-full rounded-lg border-8 border-[#B03C3C] rounded-lg" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;"></div>
+        <div id="map" class="h-[500px] w-full rounded-lg border-none rounded-xl overflow-hidden shadow-md"></div>
       </div>
 
       <!-- DETAIL (1 kolom) -->
       <div class="w-full">
-        <div id="info-panel" class="bg-[#1D6034] text-white shadow-md rounded-lg p-4 hovers">
-          <h2 class="poppins-bold text-2xl text-[#ffff] md:text-3xl mb-2">
+        <div id="info-panel" class="bg-[#ffff] text-white shadow-md rounded-lg p-4 hover-gelap">
+          <h2 class="poppins-bold text-xl text-[#4E4E4E] md:text-xl mb-2">
             Detail Tempat
           </h2>
           <div id="info" class="text-[#4B5563] bg-white">
@@ -307,33 +308,33 @@ $conn->close();
     </div>
   </div>
 
-  <div class="mx-auto px-4 w-full gap-6 grid sm:grid-cols-4 grid-cols-1 pt-10 pb-30 bg-white" id="lahan">
+  <div class="mx-auto px-4 w-full gap-6 grid sm:grid-cols-4 grid-cols-1 pt-10 pb-30" id="lahan">
     <?php if (count($lahanData) > 0): ?>
       <?php foreach ($lahanData as $lahan): ?>
-        <a href="detailLahan.php?id=<?= $lahan['id'] ?>" class="block rounded-lg p-4 shadow-xs shadow-indigo-100 bg-[#2C8F53] hovers">
+        <a href="detailLahan.php?id=<?= $lahan['id'] ?>" class="block rounded-lg p-4 shadow-xs shadow-sm bg-[#ffff] hover-gelap text-[#4E4E4E]" style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
           <img
             alt=""
             src="uploads/<?= htmlspecialchars($lahan['foto_lahan']) ?>"
             class="h-56 w-full rounded-md object-cover" />
 
-          <div class="mt-2">
+          <div class="mt-2 bg-[#ffff] rounded-lg p-3">
             <dl>
               <div>
                 <dt class="sr-only">Lokasi Lahan</dt>
 
-                <dd class="text-sm text-white nama_lahan"><?= htmlspecialchars($lahan['tempat_lahan']) ?></dd>
+                <dd class="text-sm"><?= htmlspecialchars($lahan['tempat_lahan']) ?></dd>
               </div>
 
               <div>
                 <dt class="sr-only">Nama Lahan</dt>
 
-                <dd class="font-semibold text-lg nama_lahan text-white"><?= htmlspecialchars($lahan['nama_lahan']) ?></dd>
+                <dd class="font-bold text-lg nama_lahan"><?= htmlspecialchars($lahan['nama_lahan']) ?></dd>
               </div>
             </dl>
 
-            <dl class="mt-6 flex gap-4 lg:gap-6">
+            <dl class="mt-3 flex gap-4 lg:gap-6">
               <div class="flex items-center gap-2">
-                <dt class="text-white">
+                <dt class="">
                   <span class="sr-only"> Tanggal Tanam </span>
 
                   <svg
@@ -350,7 +351,7 @@ $conn->close();
                   </svg>
                 </dt>
 
-                <dd class="text-xs text-white"><?= htmlspecialchars(date("d/m/Y", strtotime($lahan['mulai_tanam']))) ?></dd>
+                <dd class="text-xs"><?= htmlspecialchars(date("d/m/Y", strtotime($lahan['mulai_tanam']))) ?></dd>
               </div>
             </dl>
           </div>
@@ -373,8 +374,11 @@ $conn->close();
       </a>
 
       <!-- Bookmark -->
-      <a href="../php/notifikasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
-        <i class="fi fi-ss-bell text-lg"></i>
+      <a href="notifikasi.php" class="group flex flex-col items-center justify-center py-2 relative hover:text-[#1D6034] transition-all">
+        <div class="relative">
+          <i class="fi fi-ss-bell text-lg"></i>
+          <span id="notif-badge" class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1 text-[10px] hidden">0</span>
+        </div>
         <span>Notifikasi</span>
       </a>
 
@@ -387,12 +391,12 @@ $conn->close();
       </a>
 
       <!-- Search -->
-      <a href="../php/edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+      <a href="edukasi.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
         <i class="fi fi-ss-book-open-cover text-lg"></i>
         <span>Edukasi</span>
       </a>
       <!-- Settings -->
-      <a href="../php/profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
+      <a href=" profile.php" class="group py-2 px-3 flex flex-col items-center justify-center hover:text-[#1D6034] transition-all">
         <i class="fi fi-sr-user text-lg"></i>
         <span>Profil</span>
       </a>
@@ -401,25 +405,61 @@ $conn->close();
   <script src="../javascript/lahan.js"></script>
   <script src="../javascript/other.js"></script>
   <script>
-  function handleTambahLahanClick(event) {
-    event.preventDefault();
+    function handleTambahLahanClick(event) {
+      event.preventDefault();
 
-    const button = document.getElementById("tambahLahanBtn");
-    const ripple = document.getElementById("rippleEffect");
+      const button = document.getElementById("tambahLahanBtn");
+      const ripple = document.getElementById("rippleEffect");
 
-    // Nonaktifkan tombol sementara (opsional)
-    button.disabled = true;
+      // Nonaktifkan tombol sementara (opsional)
+      button.disabled = true;
 
-    // Tampilkan efek ripple putih (opsional)
-    ripple.classList.remove("opacity-0");
-    ripple.classList.add("opacity-20");
+      // Tampilkan efek ripple putih (opsional)
+      ripple.classList.remove("opacity-0");
+      ripple.classList.add("opacity-20");
 
-    // Redirect ke halaman form setelah efek sebentar
-    setTimeout(() => {
-      window.location.href = "formLahan.php";
-    }, 200);
-  }
-</script>
+      // Redirect ke halaman form setelah efek sebentar
+      setTimeout(() => {
+        window.location.href = "formLahan.php";
+      }, 200);
+    }
+
+    function cekNotifBadge() {
+      fetch("function/getNotif.php")
+        .then(res => res.json())
+        .then(data => {
+          const badge = document.getElementById("notif-badge");
+          if (data.total > 0) {
+            badge.innerText = "•";
+            badge.style.display = "inline";
+          } else {
+            badge.style.display = "none";
+          }
+        });
+    }
+
+    setInterval(cekNotifBadge, 10000);
+    cekNotifBadge();
+
+
+    function searchLahan() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let rows = document.querySelectorAll("#lahan a");
+
+      rows.forEach(function(row) {
+        let namaEl = row.querySelector(".nama_lahan");
+        if (!namaEl) return; // skip kalau tidak ada
+
+        let nama = namaEl.textContent.toLowerCase();
+
+        if (nama.includes(input)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    }
+  </script>
 
 
 </body>

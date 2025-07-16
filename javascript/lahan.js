@@ -104,13 +104,9 @@ function fetchAllLahan() {
 
                                     <p class="font-lg nunito-regular text-white">${lahan.mulai_tanam}</p>
 
-                                     <div class="grid grid-cols-2 mt-4">
-               <p class=""><a href='${lahan.link_maps}' class="text-[#ffff] hover:underline popins-regular">
-                                            Lihat Maps
-                                        </a></p>
-                                     <p class=""><a href='../php/detailLahan.php?id=${lahan.id} ?' class="text-[#ffff] hover:underline popins-regular">
-                                            Detail Lahan
-                                        </a></p>
+                                     <div class="grid grid-cols-2 gap-2 mt-4">
+                                        <a role="button" href='../php/detailLahan.php?id=${lahan.id} ?' class="btn text-sm text-[#1D6034]">Detail Lahan</a>
+                                        <a role="button" href='${lahan.link_maps}' class="btn text-sm text-[#1D6034]">Lihat di Maps</a>
         </div>
                      
                                 </div>

@@ -6,7 +6,7 @@ session_start();
 $user_id = $_SESSION['user_id'] ?? null;
 
 if ($user_id) {
-    $stmt = $conn->prepare("SELECT nama_lahan, mulai_tanam FROM lahan WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT nama_lahan, mulai_tanam FROM lahan WHERE user_id = ? AND status = 'aktif' ");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();

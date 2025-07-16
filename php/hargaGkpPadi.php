@@ -1,7 +1,8 @@
 <?php
+$tahunSekarang = date('Y');
 $provinsiDipilih = isset($_GET['provinsi']) ? $_GET['provinsi'] : 'Jawa Barat';
-$tahunChart = isset($_GET['tahun_chart']) ? intval($_GET['tahun_chart']) : date('Y');
-$tahunTabel = isset($_GET['tahun_tabel']) ? intval($_GET['tahun_tabel']) : 2024;
+$tahunChart = isset($_GET['tahun_chart']) ? intval($_GET['tahun_chart']) : $tahunSekarang;
+$tahunTabel = isset($_GET['tahun_tabel']) ? intval($_GET['tahun_tabel']) : $tahunSekarang;
 $javaProvinces = ['Banten', 'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'DI Yogyakarta', 'Jawa Timur'];
 $labels = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
@@ -91,7 +92,7 @@ foreach ($hargaSemuaProvinsi as $row) {
     }
 }
 
-$url_avg_januari = "http://127.0.0.1:5000/api/gkp-per-bulan-semua-provinsi?year=2024";
+$url_avg_januari = "http://127.0.0.1:5000/api/gkp-per-bulan-semua-provinsi?year=$tahunChart";
 $dataAvgJanuari = json_decode(fetchData($url_avg_januari), true);
 
 $hargaJanuariArray = [];
@@ -141,14 +142,14 @@ $hargaRataJanuari = count($hargaJanuariArray) > 0 ? round(array_sum($hargaJanuar
         <div class="flex items-center gap-2">
             <label for="tahun_chart" class="font-semibold">Tahun Chart:</label>
             <select name="tahun_chart" id="tahun_chart" onchange="this.form.submit()" class="p-2 border rounded">
-                <?php for ($i = 2024; $i >= 2021; $i--): ?>
+                <?php for ($i = 2026; $i >= 2021; $i--): ?>
                     <option value="<?= $i ?>" <?= $tahunChart == $i ? 'selected' : '' ?>><?= $i ?></option>
                 <?php endfor; ?>
             </select>
         </div>
     </form>
 
-    <p class="text-lg font-semibold mb-2">Harga Padi Setiap Bulan - Tahun <?= htmlspecialchars($tahunChart) ?></p>
+    <p class="text-lg font-semibold mb-2">Harga Beras Setiap Tahun <?= htmlspecialchars($tahunChart) ?></p>
     <div class="relative flex-grow h-[300px]">
         <canvas id="hargaChart"></canvas>
     </div>
@@ -156,7 +157,7 @@ $hargaRataJanuari = count($hargaJanuariArray) > 0 ? round(array_sum($hargaJanuar
 
   <!-- Average Price Section -->
   <div class="bg-white rounded-xl p-4 shadow-md flex flex-col justify-center items-center">
-    <p class="text-sm text-gray-600 mb-1">Harga Rata-rata Padi Januari 2024</p>
+    <p class="text-sm text-gray-600 mb-1">Harga Rata-rata Beras Tahun <?= htmlspecialchars($tahunChart) ?></p>
     <p class="text-xl font-bold text-green-700">
       Rp <?= $hargaRataJanuari ? number_format($hargaRataJanuari, 0, ',', '.') : 'Data Kosong'; ?>/kg
     </p>
@@ -171,7 +172,7 @@ $hargaRataJanuari = count($hargaJanuariArray) > 0 ? round(array_sum($hargaJanuar
 
           <label for="tahun_tabel" class="font-semibold">Pilih Tahun Tabel:</label>
           <select name="tahun_tabel" id="tahun_tabel" onchange="this.form.submit()" class="p-2 border rounded">
-              <?php for ($i = 2024; $i >= 2021; $i--): ?>
+              <?php for ($i = 2026; $i >= 2021; $i--): ?>
                   <option value="<?= $i ?>" <?= $tahunTabel == $i ? 'selected' : '' ?>><?= $i ?></option>
               <?php endfor; ?>
           </select>

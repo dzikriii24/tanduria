@@ -13,7 +13,7 @@ if (!$user_id) {
 }
 
 // Ambil lahan terakhir milik user
-$query = "SELECT koordinat_lat, koordinat_lng, nama_lahan FROM lahan WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
+$query = "SELECT koordinat_lat, koordinat_lng, nama_lahan FROM lahan WHERE user_id = ? AND status = 'aktif' ORDER BY created_at DESC LIMIT 1";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();

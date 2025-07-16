@@ -32,13 +32,14 @@ $iconMapping = [
 
 
 if ($user_id) {
-    $stmt = $conn->prepare("SELECT lat, lng FROM user WHERE id = ?");
+    $stmt = $conn->prepare("SELECT lat, lng, nama FROM user WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($row = $result->fetch_assoc()) {
         $lat = $row['lat'];
         $lon = $row['lng'];
+        $nama = $row['nama'];
     }
 }
 
@@ -144,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <!DOCTYPE html>
-<html lang="en" class="bg-[#F5F2EB] overflow-x-hidden">
+<html lang="en" class="bg-[#ffff] overflow-x-hidden">
 
 <head>
     <meta charset="UTF-8">
@@ -155,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" href="asset/icon/logo.svg" type="image/svg+xml">
     <title>Tanduria</title>
     <style type="text/tailwind">
     </style>
@@ -170,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- perkiraan cuaca -->
     <div class="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 px-2 mx-auto mt-2 text-white">
-        <div class="bg-[#1D6034] rounded-xl shadow p-4 hovers">
+        <div class="bg-[#1D6034] rounded-xl p-4 hover-gelap">
             <div class="flex flex-col lg:grid lg:grid-cols-2">
                 <div>
                     <div class="flex gap-2">
@@ -192,7 +194,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div>
                     <p id="jam" class="mt-4 font-medium sm:text-4xl text-xl">00:00:00</p>
-                    <p id="sapaan" class="mt-4 font-medium sm:text-xl">Selamat!</p>
+                    <p class="mt-4 font-reguler sm:text-xl">
+                    <p id="sapaan"></p><?php if ($user_id && !empty($row['nama'])): ?>
+                        <p class="mt-4 font-reguler sm:text-xl">
+                            <?= htmlspecialchars($row['nama']) ?>
+                        </p>
+                    <?php endif; ?></p>
                 </div>
 
             </div>
@@ -200,16 +207,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Panel Cuaca -->
-        <div class="hovers bg-[#1D6034] rounded-xl shadow p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">
+        <div class="hover-gelap bg-[#1D6034] rounded-xl p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">
             <div class="flex justify-center items-center flex-col">
-                <h2 class="text-lg sm:text-xl  font-medium">Cuaca Hari Ini</h2>
-                <p class="text-lg sm:text-xl font-semibold "><?= $cuaca ?></p>
-                <p class="text-lg sm:text-xl "><?= $suhu ?>°C</p>
+                <h2 class="text-lg sm:text-xl  font-semibold">Cuaca Hari Ini</h2>
+                <p class="text-lg sm:text-xl font-reguler "><?= $cuaca ?></p>
+                <p class="text-sm sm:text-xl"><?= $suhu ?>°C</p>
 
             </div>
-            <div class="flex justify-center items-center flex-col bg-[#2C8F53] w-full rounded-xl">
+            <div class="flex justify-center items-center flex-col bg-[#1D6034] w-full rounded-xl">
                 <img src="<?= $iconPath ?>" class="w-26 h-26 mb-2" alt="icon cuaca hari ini">
-
             </div>
 
         </div>
@@ -218,29 +224,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Perkiraan -->
 
 
-    <div class="w-full overflow-x-auto mt-4 px-2 mx-auto">
-        <div class="mx-auto bg-[#1D6034] text-white p-4 rounded-xl shadow w-max min-w-[600px]">
+    <div class="w-full mt-4 px-2 mx-auto">
+        <div class="mx-auto bg-[#ffff] text-[#4E4E4E] p-4 rounded-xl">
             <p class="text-xl font-semibold mb-4">Perkiraan Cuaca</p>
 
             <!-- Kontainer scroll (aktif di semua ukuran layar) -->
-            <div class="flex gap-4 overflow-x-auto px-2 pb-2">
-                <?php
-                $hariIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                ?>
-                <?php foreach ($prediksi as $p): ?>
+            <div class="relative">
+                <div class="flex gap-4 overflow-x-auto px-2 pb-2">
                     <?php
-                    $tanggalTimestamp = strtotime($p['tanggal']);
-                    $hari = $hariIndo[date('w', $tanggalTimestamp)];
-                    $jam = date('H:i', $tanggalTimestamp);
+                    $hariIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
                     ?>
-                    <div class="flex-shrink-0 bg-[#2C8F53] rounded-xl shadow p-4 w-32 sm:w-40 text-center hover-gelap">
-                        <p class="text-sm font-medium mb-1 truncate"><?= $hari ?> <?= $jam ?></p>
-                        <img src="<?= $p['icon'] ?>" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
-                        <p class="text-xs sm:text-sm font-semibold leading-tight"><?= $p['cuaca'] ?></p>
-                        <p class="text-sm"><?= $p['suhu'] ?>°C</p>
-                    </div>
-                <?php endforeach; ?>
+                    <?php foreach ($prediksi as $p): ?>
+                        <?php
+                        $tanggalTimestamp = strtotime($p['tanggal']);
+                        $hari = $hariIndo[date('w', $tanggalTimestamp)];
+                        $jam = date('H:i', $tanggalTimestamp);
+                        ?>
+                        <div class="flex-shrink-0 bg-[#1D6034] rounded-xl p-4 w-32 sm:w-40 text-center hover-gelap text-white">
+                            <p class="text-sm font-reguler mb-1 truncate"><?= $hari ?> <?= $jam ?></p>
+                            <img src="<?= $p['icon'] ?>" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
+                            <p class="text-xs sm:text-sm font-reguler leading-tight"><?= $p['cuaca'] ?></p>
+                            <p class="text-sm"><?= $p['suhu'] ?>°C</p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -250,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Kalender tanam -->
     <div class="grid grid-cols-2 mx-auto px-2 gap-2">
 
-        <div class="block rounded-xl border border-white bg-[#B03C3C] p-4 shadow-sm sm:p-6 mt-4 text-white">
+        <div class="block rounded-xl border border-white bg-[#1D6034] p-4 shadow-sm sm:p-6 mt-4 text-white">
             <div class="sm:flex sm:justify-between sm:gap-4 lg:gap-6">
                 <div class="sm:order-last sm:shrink-0">
                     <i class="fi fi-rs-diamond-exclamation text-xl"></i>
@@ -261,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Rekomendasi Tanam
                     </h3>
 
-                    <p class="mt-1 text-sm">Rekomendasi menanam padi oleh Tanduria</p>
+                    <p class="mt-1 text-sm">Rekomendasi menanam padi</p>
 
                     <p class="mt-4 text-sm text-pretty">
                         <?= $rekomendasi ?>
@@ -293,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </dl>
         </div>
 
-        <div class="block rounded-xl border border-white text-white p-4 shadow-sm sm:p-6 mt-4 bg-[#4E4E4E]">
+        <div class="block rounded-xl border border-white text-white p-4 shadow-sm sm:p-6 mt-4 bg-[#1D6034]">
             <div class="sm:flex sm:justify-between sm:gap-4 lg:gap-6">
                 <div class="sm:order-last sm:shrink-0">
                     <i class="fi fi-sr-calendar-clock text-xl"></i>
@@ -345,8 +354,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Modal -->
         <div id="faseModal" class="hidden fixed inset-0 bg-black/50 flex justify-center items-center z-50">
             <div class="bg-white rounded-lg p-6 shadow-xl w-[90%] max-w-md animate-fade-in-up">
-                <h2 id="modalTitle" class="text-lg font-semibold text-gray-800 mb-2"></h2>
-                <p id="faseText" class="text-gray-600 whitespace-pre-line"></p>
+                <h2 id="modalTitle" class="text-lg font-semibold text-[#1D6034] mb-2"></h2>
+                <p id="faseText" class="text-[#4E4E4E] whitespace-pre-line text-sm"></p>
                 <div class="text-right mt-4">
                     <button onclick="closeModal()" class="bg-[#2C8F53] text-white px-4 py-2 rounded-lg hover:bg-[#1D6034] transition">
                         Tutup
@@ -358,9 +367,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Fitur & Chatbot -->
     <div class="px-2 mx-auto rounded-xl">
-        <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 mb-30 bg-[#2C8F53] p-6 rounded-xl">
+        <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 bg-[#1D6034] p-6 rounded-xl">
 
-            <div class="grid grid-cols-2 gap-4 sm:gap-8  mx-auto">
+            <div class="grid grid-cols-2 gap-4 sm:gap-8 mx-auto">
                 <a href="php/lahan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
                     <div class="card bg-white hovers">
                         <figure class="px-10 pt-10">
@@ -371,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </figure>
                         <div class="card-body items-center text-center">
                             <h2 class="card-title">Kelola Lahan</h2>
-                            <p>title and actions parts</p>
+                            <p>Mulai tanam dan kelola lahan</p>
                         </div>
                     </div>
                 </a>
@@ -384,8 +393,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 class="rounded-xl" />
                         </figure>
                         <div class="card-body items-center text-center">
-                            <h2 class="card-title">Harga Padi</h2>
-                            <p>title and actions parts</p>
+                            <h2 class="card-title">Harga Beras</h2>
+                            <p>Prediksi harga beras</p>
                         </div>
                     </div>
                 </a>
@@ -399,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </figure>
                         <div class="card-body items-center text-center">
                             <h2 class="card-title">Chatbot</h2>
-                            <p>title saasdasdasdasdas</p>
+                            <p>Tanya solusi untuk pertanian</p>
                         </div>
                     </div>
                 </a>
@@ -413,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </figure>
                         <div class="card-body items-center text-center">
                             <h2 class="card-title">Perencanaan</h2>
-                            <p>title and actions parts</p>
+                            <p>perencanaan untuk pertanian</p>
                         </div>
                     </div>
                 </a>
@@ -421,42 +430,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="">
                 <div class="space-y-6">
                     <!-- Katalog Penyakit -->
-                    <article class="overflow-hidden rounded-lg text-white bg-[#1D6034] shadow-xs px-4 mx-auto p-4">
+                    <article class="overflow-hidden rounded-lg text-white bg-[#1D6034] px-4 mx-auto p-4">
                         <div class="">
                             <a href="#">
                                 <h3 class="text-lg font-medium">
-                                    Penyakit & Hama Umum
+                                    Konsultasi & Laporkan masalah anda kepada kami
                                 </h3>
                             </a>
-
-                            <ul class="list-disc list-inside space-y-1 text-sm italic">
-                                <li>Wereng Coklat</li>
-                                <li>Blast (Hawar Daun)</li>
-                                <li>Penggerek Batang</li>
-                                <li>Busuk Akar</li>
-                            </ul>
-
-                            <a href="#" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#fff] hover:underline">
-                                Lihat Semua Daftar Penyakit
-
-                                <span aria-hidden="true" class="block transition-all group-hover:ms-0.5 rtl:rotate-180">
-                                    &rarr;
-                                </span>
-                            </a>
-                        </div>
                     </article>
 
                     <!-- Form Konsultasi Manual -->
                     <div class="bg-white rounded-xl shadow p-4">
-                        <h3 class="text-lg font-semibold text-[#1D6034] mb-2">📤 Konsultasi Manual</h3>
+                        <h3 class="text-lg font-semibold text-[#1D6034] mb-2">Konsultasi Manual</h3>
                         <form action="" id="formKonsultasi" method="POST" enctype="multipart/form-data" class="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Deskripsikan Gejalanya</legend>
+                                <legend class="fieldset-legend text-[#4E4E4E]">Deskripsikan Gejalanya</legend>
                                 <textarea class="textarea h-24" placeholder="Daun menguning sejak 3 hari ..." required name="gejala"></textarea>
                                 <div class="label">Tunggu response di notifikasi</div>
                             </fieldset>
                             <fieldset class="fieldset">
-                                <legend class="fieldset-legend">Upload Foto</legend>
+                                <legend class="fieldset-legend text-[#4E4E4E]">Upload Foto</legend>
                                 <input type="file" class="file-input" name="foto" accept="image/*" />
                                 <label class="label">Opsional</label>
                             </fieldset>
@@ -473,7 +466,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     </div>
+    <footer class="bg-white mb-15">
+        <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="flex justify-center">
+                <img src="asset/icon/logo.svg" class="w-30 h-30" alt="">
+            </div>
 
+            <p class="mx-auto mt-6 max-w-md text-center leading-relaxed text-[#4E4E4E]">
+                Tanduria, Solusi Pertanian Anda
+            </p>
+
+        </div>
+    </footer>
 
 
 
@@ -539,7 +543,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(data => {
                     const badge = document.getElementById("notif-badge");
                     if (data.total > 0) {
-                        badge.innerText = data.total > 9 ? "9+" : data.total;
+                        badge.innerText = "•";
                         badge.style.display = "inline";
                     } else {
                         badge.style.display = "none";

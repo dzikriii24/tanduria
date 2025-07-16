@@ -16,6 +16,25 @@
         });
     }
 
+
+    function searchEdu() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let rows = document.querySelectorAll("#edu article");
+
+        rows.forEach(function (row) {
+            let namaEl = row.querySelector(".judul_edu");
+            if (!namaEl) return; // skip kalau tidak ada
+
+            let nama = namaEl.textContent.toLowerCase();
+
+            if (nama.includes(input)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
     function confirmLogout() {
         Swal.fire({
             title: 'Keluar dari akun?',
@@ -66,3 +85,7 @@
         document.getElementById("modalFotoImage").src = src;
         my_modal_foto.showModal();
     }
+
+
+    // DETAIL LAHAN
+    
