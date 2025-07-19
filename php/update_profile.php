@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- Tombol -->
   <div class="flex justify-between mt-6 gap-4">
-    <a href="profile.php" class="w-1/2 text-center bg-gray-200 py-3 rounded-lg hover:bg-gray-300">Kembali</a>
+    <a href="profile.php" class="w-1/2 text-center bg-gray-200 py-3 rounded-lg hover:bg-[#4E4E4E]">Kembali</a>
     <button type="submit" class="w-1/2 bg-[#006138] text-white py-3 rounded-lg hover:bg-[#009158]">
       Simpan Perubahan
     </button>

@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body class=" bg-gradient-to-b from-[#006138] to-[#009158] min-h-screen flex items-center justify-center px-4">
+<body class="  min-h-screen flex items-center justify-center px-4">
 
   <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl">
     <div class="text-center mb-6">
       <img src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" class="w-16 h-16 mx-auto" alt="user icon">
-      <h2 class="text-4xl font-extrabold text-transparent bg-clip-text bg-[#009158] from-indigo-600 via-blue-600 to-purple-600 mt-3">Selamat Datang</h2>
-      <p class="text-sm text-gray-500 mt-1">Silakan masuk ke akun Anda</p>
+      <h2 class="text-4xl font-extrabold text-transparent bg-clip-text bg-[#2C8F53] from-indigo-600 via-blue-600 to-purple-600 mt-3">Selamat Datang</h2>
+      <p class="text-sm text-[#4E4E4E] mt-1">Silakan masuk ke akun Anda</p>
     </div>
 
     <?php if (isset($error)): ?>
@@ -71,13 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- Login Button -->
       <div>
         <button type="submit"
-          class="w-full bg-[#009158] text-white font-bold py-3 rounded-xl hover:bg-[#006138] transition duration-200 shadow-lg">
+          class="w-full bg-[#009158] text-white font-bold py-3 rounded-xl hover:bg-[#1D6034] transition duration-200 shadow-lg">
           <i class="ph ph-sign-in mr-2"></i>  Masuk
         </button>
       </div>
     </form>
 
-    <p class="text-center text-sm text-gray-600 mt-4">
+    <p class="text-center text-sm text-[#4E4E4E] mt-4">
       Belum punya akun?
       <a href="register.php" class="text-indigo-500 hover:underline font-medium">Daftar di sini</a>
     </p>
