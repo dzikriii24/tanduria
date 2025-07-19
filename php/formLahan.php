@@ -1,3 +1,92 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['short_link'])) {
+  $shortLink = trim($_POST['short_link']);
+
+  function traceFinalRedirect($url)
+  {
+    $currentUrl = $url;
+    while (true) {
+      $ch = curl_init($currentUrl);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_NOBODY, true);
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+      curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+      $response = curl_exec($ch);
+      preg_match('/Location:\s*(.*)/i', $response, $matches);
+      curl_close($ch);
+      if (!empty($matches[1])) {
+        $currentUrl = trim($matches[1]);
+      } else {
+        break;
+      }
+    }
+    return $currentUrl;
+  }
+
+  function extractCoordinates($url)
+  {
+    // 1. Format @lat,lng di path
+    if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 2. Format /search/lat,lng
+    if (preg_match('/\/search\/(-?\d+\.\d+),\+?(-?\d+\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 3. Format ll=lat,lng di query string
+    if (preg_match('/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 4. Format !3dlat!4dlng di path /data=
+    if (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 5. Fallback: Cek apakah ada format lat,lng di mana saja
+    if (preg_match('/(-?\d+\.\d+),\s*(-?\d+\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 5. Format dir/... dengan @lat,lng di belakang
+    if (preg_match('/dir\/.*\/(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 6. Format query=lat,lng
+    if (preg_match('/[?&]query=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 7. Format tempat+koordinat jadi satu (jika memang ada)
+    if (preg_match('/\+(-?\d{1,3}\.\d+)\+(-?\d{1,3}\.\d+)/', $url, $matches)) {
+      return ['lat' => $matches[1], 'lng' => $matches[2]];
+    }
+
+    // 8. Fallback: cari 2 angka desimal berdampingan di seluruh string (ngakalin link yang panjang dengan hash)
+    if (preg_match_all('/(-?\d{1,3}\.\d{4,}),\s*(-?\d{1,3}\.\d{4,})/', $url, $matches) && count($matches[0]) > 0) {
+      return ['lat' => $matches[1][0], 'lng' => $matches[2][0]];
+    }
+    return ['lat' => null, 'lng' => null];
+  }
+
+
+
+  $finalLink = traceFinalRedirect($shortLink);
+  $coords = extractCoordinates($finalLink);
+
+  echo json_encode([
+    'final_link' => $finalLink,
+    'lat' => $coords['lat'],
+    'lng' => $coords['lng'],
+  ]);
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="id" class="bg-white">
 
@@ -17,7 +106,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/font.css">
+  <link rel="stylesheet" href="../css/font.css">
   <link rel="stylesheet" href="css/hover.css">
 
 </head>
@@ -33,11 +122,11 @@
       </a>
     </div>
     <div class="navbar-end">
-      <h2>Lahan Anda</h2>
+      <h2 class="text-xl font-semibold">Lahan Anda</h2>
     </div>
   </div>
 
-  <div class="bg-white mt-3 mx-auto px-2  lg:grid lg:grid-cols-5 shadow-lg">
+  <div class="bg-white mt-3 mx-auto px-2 lg:grid lg:grid-cols-5 shadow-lg">
     <div class="relative block h-32 lg:col-span-2 lg:h-full">
       <img
         src="../asset/icon/poster.svg"
@@ -46,17 +135,8 @@
     </div>
 
     <div class="px-4 py-16 sm:px-6 lg:col-span-3 lg:px-8">
-      <?php if (isset($_GET['error']) && $_GET['error'] === 'invalid_maps'): ?>
-        <script>
-          Swal.fire({
-            icon: 'error',
-            title: 'Gagal Ambil Koordinat',
-            text: 'Link Google Maps tidak valid atau tidak dapat dikonversi ke koordinat.',
-            confirmButtonColor: '#d33'
-          });
-        </script>
-      <?php endif; ?>
-      <div class="">
+
+      <div class="px-4 mx-auto">
 
         <form id="formLahan" action="lahan.php" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)" class="grid grid-cols-1 gap-8 sm:grid-cols-2">
           <!-- NAMA LAHAN -->
@@ -129,34 +209,20 @@
             <div class="label">Wajib diisi</div>
           </fieldset>
 
-          <!-- Linkamsp -->
-          <div class="mt-2 mb-1">
-            <label for="linkMaps" class="block text-sm font-medium text-gray-700 mb-1">Link Google Maps</label>
-
-            <div class="flex flex-col space-y-2">
-              <input type="url" id="linkMaps" name="linkMaps" placeholder="https://www.google.com/maps/place/" class="w-full rounded-lg border px-4 py-2 text-sm focus:ring-green-500 focus:outline-none">
-              <div class="flex items-center space-x-2">
-                <a href="https://www.google.com/maps" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
-                  🌍 Buka Google Maps
-                </a>
-                <span class="text-xs text-gray-500">Klik dan salin link </span>
-
-
-              </div>
-              <p class="text-sm text-gray-600 mt-4">
-                ✨ Cara Ambil Link Lokasi:
-                <br>- Buka Google Maps lewat tombol di atas.
-                <br>- Cari dan klik lokasi Anda.
-                <br>- Copy link dari address bar browser, bukan dari tombol Share.
-                <br>- Contoh format: <code>https://www.google.com/maps/place/.../@-6.175110,106.865036</code>
-              </p>
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">Masukan Link G-Maps</legend>
+            <input type="text" id="shortLink" class="input" placeholder="Isi disini" />
+            <div class="grid grid-cols-2 gap-2">
+              <a href="https://www.google.com/maps" class="btn btn-sm w-30" target="_blank">Buka Maps</a>
+              <button type="button" id="convertButton" class="btn btn-sm w-30">Convert Maps</button>
             </div>
-          </div>
 
-          <input type="hidden" id="koordinatLat" name="koordinatLat">
-          <input type="hidden" id="koordinatLng" name="koordinatLng">
+            <p class="label">Wajib diisi</p>
 
-
+            <input type="text" name="link_maps" id="linkFinal" placeholder="Link G-Maps" class="input" readonly />
+            <input type="text" name="lat" id="latFinal" placeholder="Latitude" class="input" readonly />
+            <input type="text" name="lng" id="lngFinal" placeholder="Longtitude" class="input" readonly />
+          </fieldset>
 
           <!-- FOTOO -->
           <div>
@@ -184,9 +250,16 @@
             Simpan Lahan
           </button>
 
-        </form>
       </div>
     </div>
+
+
+
+
+
+    </form>
+  </div>
+  </div>
   </div>
 
 
@@ -224,24 +297,36 @@
     }
 
     // Ambil koordinat otomatis dari link maps
-    document.getElementById('linkMaps').addEventListener('input', function() {
-      const link = this.value;
-      const latField = document.getElementById('koordinatLat');
-      const lngField = document.getElementById('koordinatLng');
-      const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (match) {
-        latField.value = match[1];
-        lngField.value = match[2];
-      } else {
-        latField.value = "";
-        lngField.value = "";
+    document.getElementById("convertButton").addEventListener("click", function() {
+      const shortLink = document.getElementById("shortLink").value;
+      if (!shortLink) {
+        alert("Masukkan link maps terlebih dahulu.");
+        return;
       }
+
+      fetch(window.location.href, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "short_link=" + encodeURIComponent(shortLink)
+        })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("linkFinal").value = data.final_link || "";
+          document.getElementById("latFinal").value = data.lat || "";
+          document.getElementById("lngFinal").value = data.lng || "";
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Gagal convert link.");
+        });
     });
 
     function handleSubmit(event) {
       event.preventDefault();
       const form = document.getElementById('formLahan');
-      const required = ['namaLahan', 'luasLahan', 'tempatLahan', 'jenisPadi', 'mulaiTanam', 'fotoLahan', 'deskripsiLahan', 'linkMaps', 'pestisida', 'modalTanam'];
+      const required = ['namaLahan', 'luasLahan', 'tempatLahan', 'jenisPadi', 'mulaiTanam', 'fotoLahan', 'deskripsiLahan', 'linkFinal', 'pestisida', 'modalTanam'];
       let pesan = "";
 
       required.forEach(id => {

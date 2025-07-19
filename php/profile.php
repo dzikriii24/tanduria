@@ -106,13 +106,13 @@ if ($lat && $lng) {
 </head>
 
 <body class="poppins-regular">
-  <div class="navbar shadow-sm bg-[#ffff] text-[#4E4E4E]">
+  <div class="navbar shadow-sm bg-white/50 text-[#4E4E4E]">
     <p class="text-xl font-semibold">Profil Anda</p>
   </div>
 
   <div>
 
-    <div class="sm:flex sm:justify-between shadow-sm">
+    <div class="sm:flex sm:justify-between shadow-sm bg-gradient-to-bl from-[#ffe4e6]  to-[#ccfbf1]">
 
       <!-- Head Profile -->
       <div class="flex justify-self-start pb-4">
@@ -152,7 +152,7 @@ if ($lat && $lng) {
 
 
       <!-- Stat -->
-      <div class="stats shadow mt-6 sm:mt-4 w-[420px] sm:w-[50%] mb-4">
+      <div class="stats shadow mt-6 sm:mt-4 w-full sm:w-[50%] mb-4">
         <div class="stat bg-[#A3CC5A] text-white">
           <div class="stat-figure">
             <i class="fi fi-sr-layer-plus text-xl sm:text-3xl"></i>
@@ -187,11 +187,7 @@ if ($lat && $lng) {
     <div class="mt-10 mx-auto px-2 mb-40">
       <div class="flow-root">
         <dl class="-my-3 divide-y divide-gray-200 rounded border border-[#4E4E4E]/20 text-lg">
-          <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt class="font-medium text-gray-900">Status</dt>
-
-            <dd class="text-gray-700 sm:col-span-2">Petani</dd>
-          </div>
+        
 
           <div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
             <dt class="font-medium text-gray-900">Jenis Kelamin</dt>

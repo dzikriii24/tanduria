@@ -67,7 +67,7 @@ fetch('php/chart.php')
                         text: 'Batas Panen',
                         style: {
                             color: '#fff',
-                            background: '#1D6034'
+                            background: 'linear-gradient(to top, #191a19, #1e5128, #4e9f3d);'
                         }
                     }
                 }]

@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- perkiraan cuaca -->
     <div class="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 px-2 mx-auto mt-2 text-white">
-        <div class="bg-[#1D6034] rounded-xl p-4 hover-gelap">
+        <div class="rounded-xl p-4 hover-gelap" style="background: conic-gradient(at bottom left, #125c13, #3e7c17, #f4a442);">
             <div class="flex flex-col lg:grid lg:grid-cols-2">
                 <div>
                     <div class="flex gap-2">
@@ -207,14 +207,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Panel Cuaca -->
-        <div class="hover-gelap bg-[#1D6034] rounded-xl p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center">
+        <div class="hover-gelap rounded-xl p-4 flex flex-col items-center justify-center text-center lg:grid lg:grid-cols-2 flex justify-center" style="background: conic-gradient(at bottom left, #125c13, #3e7c17, #f4a442);">
             <div class="flex justify-center items-center flex-col">
                 <h2 class="text-lg sm:text-xl  font-semibold">Cuaca Hari Ini</h2>
                 <p class="text-lg sm:text-xl font-reguler "><?= $cuaca ?></p>
                 <p class="text-sm sm:text-xl"><?= $suhu ?>°C</p>
 
             </div>
-            <div class="flex justify-center items-center flex-col bg-[#1D6034] w-full rounded-xl">
+            <div class="flex justify-center items-center flex-col w-full rounded-xl" style="background: linear-gradient(to top, #191a19, #1e5128, #4e9f3d);">
                 <img src="<?= $iconPath ?>" class="w-26 h-26 mb-2" alt="icon cuaca hari ini">
             </div>
 
@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $hari = $hariIndo[date('w', $tanggalTimestamp)];
                         $jam = date('H:i', $tanggalTimestamp);
                         ?>
-                        <div class="flex-shrink-0 bg-[#1D6034] rounded-xl p-4 w-32 sm:w-40 text-center hover-gelap text-white">
+                        <div class="flex-shrink-0 rounded-xl p-4 w-32 sm:w-40 text-center hover-gelap text-white" style="background: linear-gradient(to top, #191a19, #1e5128, #4e9f3d);">
                             <p class="text-sm font-reguler mb-1 truncate"><?= $hari ?> <?= $jam ?></p>
                             <img src="<?= $p['icon'] ?>" class="w-16 h-16 mx-auto mb-2" alt="icon cuaca">
                             <p class="text-xs sm:text-sm font-reguler leading-tight"><?= $p['cuaca'] ?></p>
@@ -259,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Kalender tanam -->
     <div class="grid grid-cols-2 mx-auto px-2 gap-2">
 
-        <div class="block rounded-xl border border-white bg-[#1D6034] p-4 shadow-sm sm:p-6 mt-4 text-white">
+        <div class="block rounded-xl border border-white p-4 shadow-sm sm:p-6 mt-4 text-white"  style="background: conic-gradient(at bottom left, #125c13, #3e7c17, #f4a442);">
             <div class="sm:flex sm:justify-between sm:gap-4 lg:gap-6">
                 <div class="sm:order-last sm:shrink-0">
                     <i class="fi fi-rs-diamond-exclamation text-xl"></i>
@@ -302,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </dl>
         </div>
 
-        <div class="block rounded-xl border border-white text-white p-4 shadow-sm sm:p-6 mt-4 bg-[#1D6034]">
+        <div class="block rounded-xl border border-white text-white p-4 shadow-sm sm:p-6 mt-4"  style="background: conic-gradient(at bottom left, #125c13, #3e7c17, #f4a442);">
             <div class="sm:flex sm:justify-between sm:gap-4 lg:gap-6">
                 <div class="sm:order-last sm:shrink-0">
                     <i class="fi fi-sr-calendar-clock text-xl"></i>
@@ -367,7 +367,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Fitur & Chatbot -->
     <div class="px-2 mx-auto rounded-xl">
-        <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 bg-[#1D6034] p-6 rounded-xl">
+        <div class="mt-10 mx-auto px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-8 p-6 rounded-xl" style="background: linear-gradient(to top, #191a19, #1e5128, #4e9f3d);">
 
             <div class="grid grid-cols-2 gap-4 sm:gap-8 mx-auto">
                 <a href="php/lahan.php" class="w-42 sm:w-50 shadow-sm rounded-lg mx-auto">
@@ -394,7 +394,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </figure>
                         <div class="card-body items-center text-center">
                             <h2 class="card-title">Harga Beras</h2>
-                            <p>Prediksi harga beras</p>
+                            <p>Prediksi harga beras saat ini</p>
                         </div>
                     </div>
                 </a>
@@ -430,7 +430,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="">
                 <div class="space-y-6">
                     <!-- Katalog Penyakit -->
-                    <article class="overflow-hidden rounded-lg text-white bg-[#1D6034] px-4 mx-auto p-4">
+                    <article class="overflow-hidden rounded-lg text-white px-4 mx-auto p-4">
                         <div class="">
                             <a href="#">
                                 <h3 class="text-lg font-medium">

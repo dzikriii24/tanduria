@@ -37,135 +37,208 @@ while ($row = $result->fetch_assoc()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="bg-white">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Daftar Perencanaan</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="../css/icon.css">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+  <title>Perencanaan</title>
+  <style type="text/tailwind">
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/hover.css">
+  <link rel="stylesheet" href="../css/icon.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
-<div class="max-w-6xl mx-auto p-6">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold text-green-700">Daftar Perencanaan</h1>
-    <a href="formPerencanaan.php" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-      + Tambah Perencanaan Baru
-    </a>
+
+<body class="poppins-regular">
+  <div class="navbar shadow-sm">
+    <div class="navbar-start">
+      <a href="../index.php" class="flex items-center space-x-2 bg-[#2C8F53] shadow-md rounded-full px-3 py-2 text-white hover:bg-[#1D6034] transition">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+        </svg>
+      </a>
+    </div>
+    <div class="navbar-center">
+      <h2 class="text-xl font-semibold text-[#4E4E4E]">Daftar Perencanaan</h2>
+    </div>
+    <div class="navbar-end">
+      <a href="formPerencanaan.php"
+        class="group relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#2C8F53] to-[#2C8F53] text-white px-6 py-2 rounded-lg shadow-lg hover:from-[#1D6034] hover:to-[#1D6034] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span class="absolute inset-0 bg-white opacity-0 transition duration-300 rounded-lg" id="rippleEffect"></span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </a>
+    </div>
   </div>
 
+  <!-- CONTENT -->
   <?php if (count($perencanaan) > 0): ?>
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse bg-white shadow rounded-xl text-sm">
-        <thead class="bg-green-600 text-white">
-          <tr>
-            <th class="px-4 py-3">#</th>
-            <th class="px-4 py-3">Nama Rencana</th>
-            <th class="px-4 py-3">Tanggal</th>
-            <th class="px-4 py-3">Catatan</th>
-            <th class="px-4 py-3">Luas (m²)</th>
-            <th class="px-4 py-3">Daerah</th>
-            <th class="px-4 py-3">Jumlah Karung</th>
-            <th class="px-4 py-3">Total Harga Pupuk</th>
-            <th class="px-4 py-3">Total Harga Bibit</th>
-            <th class="px-4 py-3">Modal Tanam</th>
-            <th class="px-4 py-3">Hasil Panen</th>
-            <th class="px-4 py-3">Hasil Bersih</th>
-            <th class="px-4 py-3">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($perencanaan as $i => $data): ?>
-            <tr class="border-t hover:bg-gray-50">
-              <td class="px-4 py-2"><?= ($offset + $i + 1) ?></td>
-              <td class="px-4 py-2 font-semibold"><?= htmlspecialchars($data['nama_rencana']) ?></td>
-              <td class="px-4 py-2">
-                <?= date("d M Y", strtotime($data['tanggal_mulai'])) ?>
-                s/d
-                <?= date("d M Y", strtotime($data['tanggal_selesai'])) ?>
-              </td>
-              <td class="px-4 py-2"><?= htmlspecialchars($data['catatan']) ?></td>
-              <td class="px-4 py-2"><?= number_format($data['luas_lahan']) ?></td>
-              <td class="px-4 py-2"><?= htmlspecialchars($data['daerah']) ?></td>
-              <td class="px-4 py-2"><?= $data['jumlah_pupuk'] ?> karung</td>
-              <td class="px-4 py-2 text-green-700">Rp <?= number_format($data['total_harga_pupuk']) ?></td>
-              <td class="px-4 py-2 text-green-700">Rp <?= number_format($data['total_harga_bibit']) ?></td>
-              <td class="px-4 py-2 text-green-700 font-bold">Rp <?= number_format($data['modal_tanam']) ?></td>
-              <td class="px-4 py-2 text-blue-700 font-bold">Rp <?= number_format($data['hasil_panen']) ?></td>
-              <td class="px-4 py-2 text-purple-700 font-bold">Rp <?= number_format($data['hasil_bersih']) ?></td>
-              <td class="px-4 py-2 text-center">
-                <button onclick="hapusRencana(<?= $data['id'] ?>)" class="text-red-600 hover:text-red-800">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 2a1 1 0 00-.894.553L6.382 4H4a1 1 0 000 2h12a1 1 0 100-2h-2.382l-.724-1.447A1 1 0 0012 2H8zm-3 6a1 1 0 011 1v7a1 1 0 102 0V9a1 1 0 112 0v7a1 1 0 102 0V9a1 1 0 112 0v7a1 1 0 102 0V9a1 1 0 011-1H5z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+    <div class="mx-auto px-4 grid lg:grid-cols-4 grid-cols-1 gap-4 mt-5">
+      <?php foreach ($perencanaan as $i => $data): ?>
+
+        <div class="block rounded-lg p-4 shadow-xs shadow-indigo-100" style="background: linear-gradient(to bottom left, #ffe4e6, #ccfbf1);">
+          <div class="mt-2">
+            <dl>
+              <div class="flex grid grid-cols-3">
+                <div>
+                  <dt class="sr-only">Lokasi</dt>
+
+                  <dd class="text-sm text-[#4E4E4E]"><?= htmlspecialchars($data['daerah']) ?></dd>
+                </div>
+                <div>
+                  <dt class="sr-only">Tanggal</dt>
+
+                  <dd class="text-xs text-[#4E4E4E]"><?= date("d M Y", strtotime($data['tanggal_mulai'])) ?>
+                    s/d
+                    <?= date("d M Y", strtotime($data['tanggal_selesai'])) ?></dd>
+                </div>
+                <div>
+                  <dt class="sr-only">Luas</dt>
+
+                  <dd class="text-sm text-[#4E4E4E] font-semibold"><?= number_format($data['luas_lahan']) ?> m²</dd>
+                </div>
+              </div>
+
+              <div>
+                <dt class="sr-only">Nama Rencana</dt>
+
+                <dd class="font-medium"><?= htmlspecialchars($data['nama_rencana']) ?></dd>
+              </div>
+            </dl>
+
+            <p class="mt-4 text-sm">Kebutuhan Sampai Panen</p>
+            <div class="mt-2 flex items-center gap-8 text-xs">
+
+              <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
+                <i class="fi fi-sr-bag-seedling"></i>
+
+                <div class="mt-1.5 sm:mt-0">
+                  <p class="text-[#4E4E4E]">Pupuk</p>
+
+                  <p class="font-medium"><?= $data['jumlah_pupuk'] ?> Karung</p>
+                  <p class="font-medium">Rp. <?= number_format($data['total_harga_pupuk']) ?></p>
+                </div>
+              </div>
+
+              <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
+                <i class="fi fi-sc-seedling"></i>
+
+                <div class="mt-1.5 sm:mt-0">
+                  <p class="text-[#4E4E4E]">Bibit</p>
+
+                  <p class="font-medium">Rp. <?= number_format($data['total_harga_bibit']) ?></p>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="mt-6 flex items-center gap-8 text-xs">
+              <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
+                <i class="fi fi-sr-coins"></i>
+
+                <div class="mt-1.5 sm:mt-0">
+                  <p class="text-[#4E4E4E]">Modal Tanam</p>
+
+                  <p class="font-medium">Rp. <?= number_format($data['modal_tanam']) ?></p>
+                </div>
+              </div>
+
+              <div class="sm:inline-flex sm:shrink-0 sm:items-center sm:gap-2">
+                <i class="fi fi-br-chart-mixed-up-circle-dollar"></i>
+
+                <div class="mt-1.5 sm:mt-0">
+                  <p class="text-[#4E4E4E]">Hasil Panen</p>
+
+                  <p class="font-medium">Rp. <?= number_format($data['hasil_panen']) ?></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 sm:mt-0">
+              <p class="mt-4 line-clamp-3 text-sm text-pretty text-gray-700">
+                <?= htmlspecialchars($data['catatan']) ?>
+              </p>
+            </div>
+            <dl class="mt-6 flex gap-4 lg:gap-6">
+              <div>
+                <dt class="text-sm font-medium text-gray-700">Hasil Bersih</dt>
+
+                <dd class="text-xs text-gray-700">Rp. <?= number_format($data['hasil_bersih']) ?></dd>
+              </div>
+
+              <div>
+                <dt class="text-sm font-medium text-gray-700">Hapus Perencanaan</dt>
+                <div class="flex justify-center">
+                  <button onclick="hapusRencana(<?= $data['id'] ?>)" class="text-red-600 hover:text-red-800">
+                    <i class="fi fi-ss-cross-circle"></i>
+                  </button>
+                </div>
+
+              </div>
+            </dl>
+          </div>
+        </div>
+      <?php endforeach; ?>
+
+
     </div>
-
-    <!-- PAGINATION -->
-    <?php if ($total_pages > 1): ?>
-      <div class="mt-6 flex justify-center">
-        <nav class="inline-flex space-x-1">
-          <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-            <a href="?page=<?= $i ?>" 
-              class="px-4 py-2 border rounded-lg 
-              <?= $i == $page ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' ?>">
-              <?= $i ?>
-            </a>
-          <?php endfor; ?>
-        </nav>
-      </div>
-    <?php endif; ?>
-
   <?php else: ?>
     <div class="bg-yellow-100 text-yellow-800 px-4 py-3 rounded">
       Belum ada perencanaan dibuat.
     </div>
   <?php endif; ?>
 
-  <div class="mt-6 flex justify-between">
-    <a href="../index.php" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-lg font-semibold">
-      ← Kembali
-    </a>
-  </div>
-</div>
 
-<script>
-  function hapusRencana(id) {
-    Swal.fire({
-      title: 'Yakin hapus perencanaan?',
-      text: "Data yang dihapus tidak dapat dikembalikan.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#aaa',
-      confirmButtonText: 'Hapus'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch('hapusPerencanaan.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'id=' + id
-        })
-        .then(response => response.text())
-        .then(result => {
-          if (result.trim() === 'success') {
-            Swal.fire('Terhapus!', 'Perencanaan berhasil dihapus.', 'success')
-              .then(() => location.reload());
-          } else {
-            Swal.fire('Gagal', result, 'error');
-          }
-        })
-        .catch(() => {
-          Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
-        });
-      }
-    });
-  }
-</script>
+  <script>
+    function hapusRencana(id) {
+      Swal.fire({
+        title: 'Yakin hapus perencanaan?',
+        text: "Data yang dihapus tidak dapat dikembalikan.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#aaa',
+        confirmButtonText: 'Hapus'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch('hapusPerencanaan.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: 'id=' + id
+            })
+            .then(response => response.text())
+            .then(result => {
+              if (result.trim() === 'success') {
+                Swal.fire('Terhapus!', 'Perencanaan berhasil dihapus.', 'success')
+                  .then(() => location.reload());
+              } else {
+                Swal.fire('Gagal', result, 'error');
+              }
+            })
+            .catch(() => {
+              Swal.fire('Error', 'Terjadi kesalahan saat menghapus.', 'error');
+            });
+        }
+      });
+    }
+  </script>
 </body>
+
 </html>

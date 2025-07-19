@@ -23,7 +23,8 @@ if (!isset($_SESSION['user_id'])) {
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <title>Tanduria</title>
+    <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+    <title>Lahan</title>
     <style type="text/tailwind">
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,7 +53,7 @@ if (!isset($_SESSION['user_id'])) {
 
           <div class="mt-4 flex justify-center gap-4 sm:mt-6">
             <a
-              class="inline-block rounded border border-indigo-600 bg-indigo-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+              class="inline-block rounded border border-green-600 bg-green-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
               href="login.php">
               Login Sekarang
             </a>
@@ -77,32 +78,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 
-// 🔁 Fungsi untuk resolve link pendek dan ambil koordinat
-function getRedirectLocation($url)
-{
-  $ch = curl_init($url);
-  curl_setopt($ch, CURLOPT_HEADER, true);
-  curl_setopt($ch, CURLOPT_NOBODY, true);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
-  $headers = curl_exec($ch);
-  curl_close($ch);
-
-  if (preg_match('/Location: (.*)/i', $headers, $match)) {
-    return trim($match[1]);
-  }
-  return null;
-}
-
-function extractCoordinates($url)
-{
-  if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
-    return ['lat' => $matches[1], 'lng' => $matches[2]];
-  }
-  return ['lat' => null, 'lng' => null];
-}
-
 
 // ✅ Simpan Data Jika POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -112,31 +87,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $jenis     = $_POST['jenisPadi'];
   $tanam     = $_POST['mulaiTanam'];
   $deskripsi = $_POST['deskripsiLahan'];
-  $maps      = $_POST['linkMaps'];
+  $link_maps = $_POST['link_maps'];
   $pestisida = $_POST['pestisida'];
   $modal     = $_POST['modalTanam'];
-  $lat       = $_POST['koordinatLat'];
-  $lng       = $_POST['koordinatLng'];
+  $lat = floatval($_POST['lat']);
+  $lng = floatval($_POST['lng']);
 
-  // 🌐 Coba ambil koordinat dari link maps pendek jika lat/lng kosong
-  if ((!$lat || !$lng) && strpos($maps, 'https://maps.app.goo.gl') === 0) {
-    $resolved = getRedirectLocation($maps);
-    if ($resolved) {
-      $coords = extractCoordinates($resolved);
-      $lat = $coords['lat'];
-      $lng = $coords['lng'];
-    }
-  }
 
-  // ❌ Jika tetap tidak dapat koordinat
-  if (!$lat || !$lng) {
-    header("Location: formLahan.php?error=invalid_maps");
-    exit;
-  }
-
-  // Konversi koordinat agar tidak dipotong
-  $lat = floatval($lat);
-  $lng = floatval($lng);
 
   // 📷 Upload File
   $fotoName = $_FILES['fotoLahan']['name'];
@@ -165,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $tanam,
       $newFileName,
       $deskripsi,
-      $maps,
+      $link_maps,
       $pestisida,
       $modal,
       $lat,
@@ -311,13 +268,16 @@ $conn->close();
   <div class="mx-auto px-4 w-full gap-6 grid sm:grid-cols-4 grid-cols-1 pt-10 pb-30" id="lahan">
     <?php if (count($lahanData) > 0): ?>
       <?php foreach ($lahanData as $lahan): ?>
-        <a href="detailLahan.php?id=<?= $lahan['id'] ?>" class="block rounded-lg p-4 shadow-xs shadow-sm bg-[#ffff] hover-gelap text-[#4E4E4E]" style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+        <a href="detailLahan.php?id=<?= $lahan['id'] ?>"
+          class="block rounded-lg p-4 shadow-xs shadow-sm bg-cover bg-center hover-gelap text-[#4E4E4E]"
+          style="background-image: url('../asset/icon/bgcard.svg'); box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+
           <img
             alt=""
             src="uploads/<?= htmlspecialchars($lahan['foto_lahan']) ?>"
             class="h-56 w-full rounded-md object-cover" />
 
-          <div class="mt-2 bg-[#ffff] rounded-lg p-3">
+          <div class="mt-2 bg-[#ffff] rounded-lg p-3 shadow-lg">
             <dl>
               <div>
                 <dt class="sr-only">Lokasi Lahan</dt>

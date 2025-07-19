@@ -1,0 +1,20 @@
+[
+    {
+        "device_id": "dev22",
+        "action": "start_irrigation",
+        "timestamp": 1752913336,
+        "duration": 10
+    },
+    {
+        "device_id": "deve213",
+        "action": "start_irrigation",
+        "timestamp": 1752913412,
+        "duration": 100
+    },
+    {
+        "device_id": "dev225",
+        "action": "start_irrigation",
+        "timestamp": 1752913610,
+        "duration": 10
+    }
+]

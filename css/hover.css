@@ -27,3 +27,23 @@
   .hover-gelap:hover {
       box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   }
+
+
+  .dock a,
+  .dock button {
+      background: #2C8F53;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+  }
+
+  .dock a:hover,
+  .dock button:hover {
+      background: #1D6034;
+  }
+
+  .dock {
+      display: flex;
+      gap: 8px;
+  }

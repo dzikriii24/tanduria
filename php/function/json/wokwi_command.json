@@ -1,0 +1,82 @@
+[
+    {
+        "id": "cmd_687b6b4492e4c4.26864795",
+        "device_id": "123",
+        "action": "start_irrigation",
+        "timestamp": 1752918852,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b6b923d5172.32735389",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752918930,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b6be0a299a6.63358093",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752919008,
+        "executed": false,
+        "duration": 20
+    },
+    {
+        "id": "cmd_687b6d2911baf0.21482452",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752919337,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b6dd8649657.61139404",
+        "device_id": "dev225",
+        "action": "start_irrigation",
+        "timestamp": 1752919512,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b6e885c3283.08022100",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752919688,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b6ff831ecb3.05351964",
+        "device_id": "dev225",
+        "action": "start_irrigation",
+        "timestamp": 1752920056,
+        "executed": false,
+        "duration": 10
+    },
+    {
+        "id": "cmd_687b7107cd3475.30503275",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752920327,
+        "executed": false,
+        "duration": 12
+    },
+    {
+        "id": "cmd_687b711791f7e2.52848893",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752920343,
+        "executed": false,
+        "duration": 8
+    },
+    {
+        "id": "cmd_687b71be049589.00291926",
+        "device_id": "DEVICE_001",
+        "action": "start_irrigation",
+        "timestamp": 1752920510,
+        "executed": false,
+        "duration": 10
+    }
+]

@@ -92,7 +92,7 @@ $koordinat_lng = $lahan['koordinat_lng'];
 $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_lng}&output=embed";
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="bg-white poppins-regular">
 
 <head>
   <meta charset="UTF-8">
@@ -104,9 +104,11 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
   <title>Detail Lahan - <?= htmlspecialchars($lahan['nama_lahan']) ?></title>
+  <link rel="icon" href="../asset/icon/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/font.css">
 </head>
 
-<body class="bg-white">
+<body class="bg-white poppins-regular">
   <?php if ($showSuccessAlert): ?>
     <script>
       Swal.fire({
@@ -129,7 +131,7 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
 
   <div class="navbar text-white bg-white shadow-sm flex justify-between items-center px-4 py-2">
     <!-- Tombol Back -->
-    <a href="lahan.php" class="flex items-center space-x-2 bg-white shadow-md rounded-full px-3 py-2 text-gray-800 hover:bg-gray-100 transition">
+    <a href="lahan.php" class="flex items-center space-x-2 bg-[#2C8F53] shadow-md rounded-full px-3 py-2 text-white hover:bg-[#1D6034] transition">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
       </svg>
@@ -141,7 +143,8 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
     </div>
 
     <!-- Lokasi -->
-    <div class="text-right">
+    <div class="text-right flex gap-4 px-4">
+      <i class="fi fi-ss-marker text-sm text-[#4E4E4E]"></i>
       <p class="poppins-reguler text-xs sm:text-sm text-[#4E4E4E]"><?= htmlspecialchars($lahan['tempat_lahan']) ?></p>
     </div>
   </div>
@@ -169,7 +172,7 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
 
 
   <!-- Spesifikasi Lahan -->
-  <h3 class="text-black text-xl font-semibold mx-auto px-4 mt-4">Spesifikasi Lahan</h3>
+  <h3 class="text-[#4E4E4E] text-xl font-semibold mx-auto px-4 mt-4">Spesifikasi Lahan</h3>
   <div class="flow-root grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 mx-auto px-4">
     <div>
       <dl class="divide-y divide-gray-200 rounded border border-gray-200 text-sm *:even:bg-gray-50">
@@ -230,9 +233,9 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
 
   <div class="mx-auto max-w-screen-xl px-4 mt-6">
     <div class="text-center">
-      <h2 class="text-3xl font-extrabold text-gray-900 sm:text-5xl">Rp. <?= number_format($hargaRataHariIni, 0, ',', '.') ?></h2>
+      <h2 class="text-3xl font-extrabold text-[#1D6034] sm:text-5xl">Rp. <?= number_format($hargaRataHariIni, 0, ',', '.') ?></h2>
 
-      <p class="mx-auto mt-4 max-w-sm text-gray-500">
+      <p class="mx-auto mt-4 max-w-sm text-[#4E4E4E]">
         Prediksi rata-rata harga beras di Indonesia untuk tanggal <?= date('d-m-Y'); ?> berdasarkan data terbaru.
       </p>
     </div>
@@ -245,14 +248,14 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
   <div class="mt-10 px-4 mb-30">
     <!-- Daftar Aktivitas -->
     <div class="mt-4 mx-auto px-4">
-      <h3 class="text-black text-xl font-semibold">Riwayat Aktivitas Lahan</h3>
+      <h3 class="text-[#4E4E4E] text-xl font-semibold">Riwayat Aktivitas Lahan</h3>
 
       <?php if (count($aktivitas) === 0): ?>
-        <p class="text-gray-600 mt-2">Belum ada aktivitas tercatat.</p>
+        <p class="text-[#4E4E4E] mt-2">Belum ada aktivitas tercatat.</p>
       <?php else: ?>
         <div class="grid sm:grid-cols-2 gap-4 mt-4">
           <?php foreach ($aktivitas as $act): ?>
-            <div class="block rounded-md border border-gray-300 p-4 shadow-sm sm:p-6 bg-gray-50">
+            <div class="block rounded-md border border-gray-300 p-4 shadow-sm sm:p-6 bg-gradient-to-r from-white to-[#2C8F53]/40">
               <div>
                 <h3 class="text-lg font-semibold text-gray-900">
                   <?= htmlspecialchars($act['jenis_aktivitas']) ?>
@@ -289,7 +292,7 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
 
               <div class="mt-4">
                 <?php if (!empty($act['catatan'])): ?>
-                  <p class="text-sm text-gray-700 italic border-l-4 border-blue-400 pl-3"><?= nl2br(htmlspecialchars($act['catatan'])) ?></p>
+                  <p class="text-sm text-gray-700 italic border-l-4 border-[#1D6034] pl-3"><?= nl2br(htmlspecialchars($act['catatan'])) ?></p>
                 <?php endif; ?>
               </div>
             </div>
@@ -359,7 +362,7 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
 
 
 
-  <div class="dock">
+  <div class="dock" style="background-color: #ffff; color:#1D6034;">
     <a href="<?= htmlspecialchars($lahan['link_maps']) ?>" target="_blank">
       <i class="fi fi-ss-marker text-lg"></i>
       <span class="dock-label">Lokasi Lahan</span>
@@ -370,11 +373,11 @@ $maps_embed_url = "https://www.google.com/maps?q={$koordinat_lat},{$koordinat_ln
       <span class="dock-label">Tambah Aktifitas</span>
     </button>
 
-    <button class="btn-selesai" data-id="<?= $lahan['id'] ?>">
+    <button class="btn-selesai" data-id="<?= $lahan['id'] ?>" style="color:#1D6034">
       <i class="fi fi-sr-clipboard-check text-lg"></i>
       <span class="dock-label">Selesaikan Lahan</span>
     </button>
-    <button class="btn-hapus" data-id="<?= $lahan['id'] ?>">
+    <button class="btn-hapus" data-id="<?= $lahan['id'] ?>" style="color:#B03C3C;">
       <i class="fi fi-ss-trash text-lg"></i>
       <span class="dock-label">Hapus Lahan</span>
     </button>

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "author": "dzikri",
+  "devices": [
+    {
+      "type": "esp32",
+      "id": "esp",
+      "name": "ESP32 Dev Module"
+    },
+    {
+      "type": "relay",
+      "id": "relay1",
+      "name": "Relay",
+      "pins": {
+        "VCC": "3V3",
+        "IN": "D2",
+        "GND": "GND"
+      }
+    }
+  ]
+}
